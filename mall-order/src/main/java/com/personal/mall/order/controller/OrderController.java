@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.personal.mall.order.feign.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,9 +33,15 @@ public class OrderController {
     @Autowired
     private ProductService productService;
 
+    @Value("${user.userName}")
+    private String userName;
+    @Value("${user.age}")
+    private Integer age;
+
     @GetMapping("/product")
     public R queryAllBrand() {
-        return R.ok().put("products",productService.queryAllBrand());
+//        return R.ok().put("products",productService.queryAllBrand());
+        return R.ok().put("name",userName).put("age",age);
     }
 
     /**

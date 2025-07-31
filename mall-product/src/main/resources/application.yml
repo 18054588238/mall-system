@@ -1,16 +1,16 @@
 spring:
-  application:
-    name: mall-product
+#  application:
+#    name: mall-product
   datasource:
     username: root
     password: rootroot
     url: jdbc:mysql://localhost:3306/mall-pms
     driver-class-name: com.mysql.cj.jdbc.Driver
 # ??????????
-  cloud:
-    nacos:
-      discovery:
-        server-addr: 127.0.0.1:8848
+#  cloud:
+#    nacos:
+#      discovery:
+#        server-addr: 127.0.0.1:8848
 mybatis-plus:
   mapper-locations: classpath*:/mapper/**/*.xml
   global-config:
