@@ -7,11 +7,31 @@ spring:
         server-addr: 127.0.0.1:8848
     gateway:
       routes:
-        - id: route1
+        - id: route1 #- 表示可以配置一组路由信息
           uri: http://www.baidu.com
-          predicates:
-            - Query=url,baidu
+          predicates: # 断言
+            - Query=url,baidu # 参数含有url=baidu
         - id: route2
           uri: http://www.jd.com
           predicates:
             - Query=url,jd
+        - id: product_router  # 路由的唯一标识符，用于区分不同路由规则。
+          uri: lb://mall-product # 目标服务地址：
+          #lb:// 表示启用负载均衡（通过注册中心如 Nacos 查找服务）。
+          #mall-product 是目标微服务在注册中心的服务名。
+          predicates:
+            - Path=/app/product/** # 所有以 /app/product/ 开头的请求（如 /app/product/list）
+          filters:
+            - RewritePath=/app/?(?<segment>.*), /$\{segment} # 路径重写过滤器
+        - id: mall-thirty  # 路由的唯一标识符，用于区分不同路由规则。
+          uri: lb://mall-thirty
+          predicates:
+            - Path=/app/thirty/** # 所有以 /app/product/ 开头的请求（如 /app/product/list）
+          filters:
+            - RewritePath=/app/?(?<segment>.*), /$\{segment} # 路径重写过滤器
+        - id: app_route
+          uri: lb://renren-fast # 负载均衡
+          predicates:
+            - Path=/app/**
+          filters:
+            - RewritePath=/app/?(?<segment>.*), /renren-fast/$\{segment} #重写请求路径，在捕获的路径前添加 /renren-fast/

@@ -1,14 +1,11 @@
 package com.personal.mall.product.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.personal.mall.product.entity.CategoryEntity;
 import com.personal.mall.product.service.CategoryService;
@@ -40,6 +37,15 @@ public class CategoryController {
         return R.ok().put("page", page);
     }
 
+    /**
+     * 树形分类列表
+     */
+    @GetMapping("/treeList")
+    public R treeList(@RequestParam Map<String, Object> params){
+        List<CategoryEntity> list = categoryService.queryPageWithTree(params);
+        return R.ok().put("data", list);
+    }
+
 
     /**
      * 信息
@@ -68,6 +74,15 @@ public class CategoryController {
     public R update(@RequestBody CategoryEntity category){
 		categoryService.updateById(category);
 
+        return R.ok();
+    }
+
+    /**
+     * 修改
+     */
+    @RequestMapping("/updateBatch")
+    public R updateBatch(@RequestBody CategoryEntity[] category){
+        categoryService.updateBatchById(Arrays.asList(category));
         return R.ok();
     }
 

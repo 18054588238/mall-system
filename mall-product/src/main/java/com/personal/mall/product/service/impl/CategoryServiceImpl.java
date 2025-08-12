@@ -1,7 +1,10 @@
 package com.personal.mall.product.service.impl;
 
 import org.springframework.stereotype.Service;
-import java.util.Map;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -24,6 +27,42 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         );
 
         return new PageUtils(page);
+    }
+
+    /**
+     * 查询所有的类别数据，然后将数据封装为树形结构，便于前端使用
+     *
+     * @param params
+     * @return
+     */
+    @Override
+    public List<CategoryEntity> queryPageWithTree(Map<String, Object> params) {
+        // 所有类别数据
+        List<CategoryEntity> categoryEntities = baseMapper.selectList(null);
+        List<CategoryEntity> collect = categoryEntities.stream()
+                .filter(cate -> cate.getParentCid() == 0)  // 一级分类
+                .peek(cate -> {
+                    // 根据大类找到所有的小类
+                    cate.setChildren(getCategoryChildren(cate, categoryEntities));
+                })
+                .sorted(Comparator.comparingInt(
+                        entity -> entity.getSort() != null ? entity.getSort() : 0
+                )).collect(Collectors.toList());
+        return collect;
+    }
+
+    private List<CategoryEntity> getCategoryChildren(CategoryEntity cate, List<CategoryEntity> categoryEntities) {
+        // 二级分类
+        return categoryEntities.stream()
+                .filter(category -> Objects.equals(category.getParentCid(), cate.getCatId())) // 二级分类
+                .peek(category -> {
+                    // 为当前category设置子节点
+                    category.setChildren(getCategoryChildren(category, categoryEntities));
+                })
+                // 对子分类列表按 sort 字段升序排序
+                .sorted(Comparator.comparingInt(
+                        entity -> entity.getSort() != null ? entity.getSort() : 0
+                )).collect(Collectors.toList());
     }
 
 }
