@@ -1,14 +1,13 @@
 package com.personal.mall.ware.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
+import com.personal.mall.ware.entity.vo.MergeVO;
+import com.personal.mall.ware.entity.vo.PurchaseVO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.personal.mall.ware.entity.PurchaseEntity;
 import com.personal.mall.ware.service.PurchaseService;
@@ -29,6 +28,36 @@ import com.personal.common.utils.R;
 public class PurchaseController {
     @Autowired
     private PurchaseService purchaseService;
+
+    // 领取采购单
+    @PostMapping("/done")
+    public R done(@RequestBody PurchaseVO vo) {
+        purchaseService.done(vo);
+
+        return R.ok();
+    }
+
+    // 领取采购单
+    @PostMapping("/receive")
+    public R receive(@RequestBody List<Long> purchaseIds) {
+        purchaseService.receive(purchaseIds);
+
+        return R.ok();
+    }
+
+    @PostMapping("/merge")
+    public R merge(@RequestBody MergeVO vo) {
+        Integer flag = purchaseService.merge(vo);
+
+        return R.ok();
+    }
+
+    @RequestMapping("/unreceive/list")
+    public R unreceiveList(@RequestParam Map<String, Object> params){
+        PageUtils page = purchaseService.queryPageUnreceive(params);
+
+        return R.ok().put("page", page);
+    }
 
     /**
      * 列表

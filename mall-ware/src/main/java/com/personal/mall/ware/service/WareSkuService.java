@@ -2,6 +2,7 @@ package com.personal.mall.ware.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.personal.common.utils.PageUtils;
+import com.personal.mall.ware.entity.PurchaseDetailEntity;
 import com.personal.mall.ware.entity.WareSkuEntity;
 
 import java.util.Map;
@@ -16,5 +17,7 @@ import java.util.Map;
 public interface WareSkuService extends IService<WareSkuEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    void addStock(PurchaseDetailEntity detailEntity);
 }
 

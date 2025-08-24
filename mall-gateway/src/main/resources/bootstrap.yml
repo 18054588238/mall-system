@@ -26,9 +26,21 @@ spring:
         - id: mall-thirty  # 路由的唯一标识符，用于区分不同路由规则。
           uri: lb://mall-thirty
           predicates:
-            - Path=/app/thirty/** # 所有以 /app/product/ 开头的请求（如 /app/product/list）
+            - Path=/app/thirty/**
           filters:
-            - RewritePath=/app/?(?<segment>.*), /$\{segment} # 路径重写过滤器
+            - RewritePath=/app/thirty/?(?<segment>.*), /$\{segment} # 路径重写过滤器
+        - id: mall-member  # 路由的唯一标识符，用于区分不同路由规则。
+          uri: lb://mall-member
+          predicates:
+            - Path=/app/member/**
+          filters:
+            - RewritePath=/app/?(?<segment>.*), /$\{segment}
+        - id: mall-ware  # 路由的唯一标识符，用于区分不同路由规则。
+          uri: lb://mall-ware
+          predicates:
+            - Path=/app/ware/**
+          filters:
+            - RewritePath=/app/?(?<segment>.*), /$\{segment}
         - id: app_route
           uri: lb://renren-fast # 负载均衡
           predicates:

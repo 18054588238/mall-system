@@ -4,8 +4,11 @@ spring:
   datasource:
     username: root
     password: rootroot
-    url: jdbc:mysql://localhost:3306/mall-pms
+    url: jdbc:mysql://localhost:3306/mall-pms?serverTimezone=Asia/Shanghai
     driver-class-name: com.mysql.cj.jdbc.Driver
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
 # ??????????
 #  cloud:
 #    nacos:

@@ -1,7 +1,18 @@
 server:
   port: 8090
-minio:
-  endpoint: http://127.0.0.1:9000
-  accessKey: minioadmin
-  secretKey: minioadmin
-  bucketName: mall-product
+spring:
+  cloud:
+    alicloud:
+      # 用户登录名称 mall-system@1739855270690810.onaliyun.com
+      # AccessKey ID LTAI5tD7473XUEwxptrCcYYR
+      # AccessKey Secret TCP2sVAz4iUaxBlKy3TOgG03vUblyl
+      oss:
+        endpoint: oss-cn-hangzhou.aliyuncs.com
+        bucket: mall-system-personal
+      access-key: LTAI5tD7473XUEwxptrCcYYR
+      secret-key: TCP2sVAz4iUaxBlKy3TOgG03vUblyl
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+  application:
+    name: mall-thirty

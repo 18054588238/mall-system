@@ -3,12 +3,9 @@ package com.personal.mall.coupon.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.personal.common.dto.SpuBoundsDTO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.personal.mall.coupon.entity.SpuBoundsEntity;
 import com.personal.mall.coupon.service.SpuBoundsService;
@@ -51,6 +48,12 @@ public class SpuBoundsController {
         return R.ok().put("spuBounds", spuBounds);
     }
 
+    @PostMapping("/saveinfo")
+    public R saveSpuBounds(@RequestBody SpuBoundsDTO dto){
+        spuBoundsService.saveBounds(dto);
+
+        return R.ok();
+    }
     /**
      * 保存
      */

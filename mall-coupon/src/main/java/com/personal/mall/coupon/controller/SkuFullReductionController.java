@@ -3,12 +3,9 @@ package com.personal.mall.coupon.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.personal.common.dto.SkuReductionDTO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.personal.mall.coupon.entity.SkuFullReductionEntity;
 import com.personal.mall.coupon.service.SkuFullReductionService;
@@ -49,6 +46,18 @@ public class SkuFullReductionController {
 		SkuFullReductionEntity skuFullReduction = skuFullReductionService.getById(id);
 
         return R.ok().put("skuFullReduction", skuFullReduction);
+    }
+
+    /**
+     * 保存满减/折扣/会员价信息
+     * @param dto
+     * @return
+     */
+    @PostMapping("/saveinfo")
+    public R saveFullReductionInfo(@RequestBody SkuReductionDTO dto){
+        skuFullReductionService.saveSkuReduction(dto);
+
+        return R.ok();
     }
 
     /**

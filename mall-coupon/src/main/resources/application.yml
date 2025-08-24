@@ -4,7 +4,7 @@ spring:
   datasource:
     username: root
     password: rootroot
-    url: jdbc:mysql://localhost:3306/mall-oms
+    url: jdbc:mysql://localhost:3306/mall-sms
     driver-class-name: com.mysql.cj.jdbc.Driver
 #  cloud:
 #    nacos:

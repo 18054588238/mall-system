@@ -1,6 +1,13 @@
 package com.personal.mall.product.service.impl;
 
+import com.personal.mall.product.entity.vo.AttrGroupWithAttrsVO;
+import com.personal.mall.product.entity.vo.AttrRelaDelVO;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -24,6 +31,17 @@ public class AttrAttrgroupRelationServiceImpl extends ServiceImpl<AttrAttrgroupR
         );
 
         return new PageUtils(page);
+    }
+
+    @Override
+    public void addRelaAttr(AttrRelaDelVO[] attrRelaDelVO) {
+        List<AttrAttrgroupRelationEntity> list = new ArrayList<>();
+        Arrays.asList(attrRelaDelVO).forEach(item -> {
+            AttrAttrgroupRelationEntity relationEntity = new AttrAttrgroupRelationEntity();
+            BeanUtils.copyProperties(item, relationEntity);
+            list.add(relationEntity);
+        });
+        this.saveBatch(list);
     }
 
 }

@@ -1,9 +1,14 @@
 package com.personal.mall.product.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.personal.common.utils.PageUtils;
+import com.personal.mall.product.entity.BrandEntity;
 import com.personal.mall.product.entity.CategoryBrandRelationEntity;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,5 +21,13 @@ import java.util.Map;
 public interface CategoryBrandRelationService extends IService<CategoryBrandRelationEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    void saveDetail(CategoryBrandRelationEntity categoryBrandRelation);
+
+    void updateBrandName(Long brandId, String brandName);
+
+    void updateCategoryName(Long catId, String name);
+
+    List<CategoryBrandRelationEntity> brandsList(Long catId);
 }
 

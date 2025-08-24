@@ -1,10 +1,10 @@
 spring:
-#  application:
-#    name: mall-member
+  application:
+    name: mall-member
   datasource:
     username: root
     password: rootroot
-    url: jdbc:mysql://localhost:3306/mall-sms
+    url: jdbc:mysql://localhost:3306/mall-ums
     driver-class-name: com.mysql.cj.jdbc.Driver
 #  cloud:
 #    nacos:

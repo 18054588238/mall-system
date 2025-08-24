@@ -72,7 +72,8 @@ public class BrandController {
      */
     @RequestMapping("/update")
     public R update(@Validated(UpdateGroupsInterface.class) @RequestBody BrandEntity brand){
-		brandService.updateById(brand);
+//		brandService.updateById(brand);
+		brandService.updateDetail(brand);
 
         return R.ok();
     }

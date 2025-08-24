@@ -1,5 +1,8 @@
 package com.personal.mall.product.service.impl;
 
+import com.personal.mall.product.service.CategoryBrandRelationService;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -14,11 +17,14 @@ import com.personal.common.utils.Query;
 import com.personal.mall.product.dao.CategoryDao;
 import com.personal.mall.product.entity.CategoryEntity;
 import com.personal.mall.product.service.CategoryService;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service("categoryService")
 public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity> implements CategoryService {
 
+    @Autowired
+    CategoryBrandRelationService categoryBrandRelationService;
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<CategoryEntity> page = this.page(
@@ -49,6 +55,31 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
                         entity -> entity.getSort() != null ? entity.getSort() : 0
                 )).collect(Collectors.toList());
         return collect;
+    }
+
+    @Override
+    public Long[] getCatelogPath(Long attrGroupId) {
+        List<Long> paths = new ArrayList<>();
+        getPath(attrGroupId,paths);
+        Collections.reverse(paths);
+        return paths.toArray(new Long[paths.size()]);
+    }
+
+    @Transactional
+    @Override
+    public void updateDetail(CategoryEntity category) {
+        this.updateById(category);
+        if (!StringUtils.isEmpty(category.getName())) {
+            categoryBrandRelationService.updateCategoryName(category.getCatId(),category.getName());
+        }
+    }
+
+    private void getPath(Long attrGroupId, List<Long> paths) {
+        paths.add(attrGroupId);
+        Long cid = this.getById(attrGroupId).getParentCid();
+        if ( cid != 0) {
+            getPath(cid,paths);
+        }
     }
 
     private List<CategoryEntity> getCategoryChildren(CategoryEntity cate, List<CategoryEntity> categoryEntities) {

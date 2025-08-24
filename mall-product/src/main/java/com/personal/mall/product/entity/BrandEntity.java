@@ -10,10 +10,9 @@ import com.personal.common.exception.groups.AddGroupsInterface;
 import com.personal.common.exception.groups.UpdateGroupsInterface;
 import com.personal.common.valid.ListValue;
 import lombok.Data;
+import org.hibernate.validator.constraints.URL;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
+import javax.validation.constraints.*;
 
 /**
  * 品牌
@@ -37,12 +36,13 @@ public class BrandEntity implements Serializable {
 	/**
 	 * 品牌名
 	 */
-	@NotBlank(message = "品牌名称不能为null",groups = AddGroupsInterface.class)
+	@NotBlank(message = "品牌名称不能为null",groups = {AddGroupsInterface.class, UpdateGroupsInterface.class})
 	private String name;
 	/**
 	 * 品牌logo地址
 	 */
-	@NotBlank(message = "logo不能为null",groups = AddGroupsInterface.class)
+	@NotBlank(message = "logo不能为null",groups = {AddGroupsInterface.class})
+	@URL(message = "请传入合法的url",groups = {AddGroupsInterface.class, UpdateGroupsInterface.class})
 	private String logo;
 	/**
 	 * 介绍
@@ -51,17 +51,20 @@ public class BrandEntity implements Serializable {
 	/**
 	 * 显示状态[0-不显示；1-显示]
 	 */
-	@ListValue
+	@NotNull(message = "显示状态不能为null",groups = AddGroupsInterface.class)
+	@ListValue(val = {0,1},groups = {AddGroupsInterface.class, UpdateGroupsInterface.class})
 	private Integer showStatus;
 	/**
 	 * 检索首字母
 	 */
 	@NotBlank(message = "检索首字母不能为null",groups = AddGroupsInterface.class)
+	@Pattern(regexp = "^[a-zA-Z]$",message = "检索首字母必须是单个字母",groups = {AddGroupsInterface.class, UpdateGroupsInterface.class})
 	private String firstLetter;
 	/**
 	 * 排序
 	 */
 	@NotNull(message = "排序不能为null",groups = AddGroupsInterface.class)
+	@Min(value = 0,message = "排序不能小于0",groups = {AddGroupsInterface.class, UpdateGroupsInterface.class})
 	private Integer sort;
 
 }
