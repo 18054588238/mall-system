@@ -23,6 +23,7 @@
         <module>mall-commons</module>
 		<module>mall-gateway</module>
 		<module>mall-thirty-party</module>
+		<module>mall-search</module>
     </modules>
 
 
