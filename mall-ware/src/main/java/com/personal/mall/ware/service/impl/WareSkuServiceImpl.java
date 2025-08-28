@@ -10,6 +10,8 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -29,6 +31,8 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
 
     @Autowired
     private ProductFeignService productFeignService;
+    @Autowired
+    private WareSkuDao wareSkuDao;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -80,6 +84,19 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
             this.update(wareSku,new UpdateWrapper<WareSkuEntity>()
                     .set("stock", wareSku.getStock() + detailEntity.getSkuNum()));
         }
+    }
+
+    @Override
+    public List<Long> haveStock(List<Long> skuIds) {
+        ArrayList<Long> list = new ArrayList<>();
+        skuIds.forEach(s -> {
+            Integer stock = wareSkuDao.getStock(s);
+            if (stock > 0) {
+                list.add(s);
+            }
+        });
+
+        return list;
     }
 
 }

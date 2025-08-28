@@ -5,6 +5,7 @@ import com.personal.common.utils.PageUtils;
 import com.personal.mall.ware.entity.PurchaseDetailEntity;
 import com.personal.mall.ware.entity.WareSkuEntity;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,5 +20,7 @@ public interface WareSkuService extends IService<WareSkuEntity> {
     PageUtils queryPage(Map<String, Object> params);
 
     void addStock(PurchaseDetailEntity detailEntity);
+
+    List<Long> haveStock(List<Long> skuId);
 }
 

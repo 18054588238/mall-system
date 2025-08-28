@@ -1,14 +1,11 @@
 package com.personal.mall.ware.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.personal.mall.ware.entity.WareSkuEntity;
 import com.personal.mall.ware.service.WareSkuService;
@@ -29,6 +26,16 @@ import com.personal.common.utils.R;
 public class WareSkuController {
     @Autowired
     private WareSkuService wareSkuService;
+
+    /**
+     * 返回有库存的sku_id列表
+     */
+    @GetMapping("/haveStock")
+    public List<Long> haveStock(List<Long> skuIds){
+        List<Long> skuStockIds = wareSkuService.haveStock(skuIds);
+
+        return skuStockIds;
+    }
 
     /**
      * 列表

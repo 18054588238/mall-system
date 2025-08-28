@@ -1,6 +1,7 @@
 package com.personal.mall.product.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.personal.common.dto.SkuESModel;
 import com.personal.common.dto.SpuBoundsDTO;
 import com.personal.common.dto.SkuReductionDTO;
 import com.personal.common.utils.R;
@@ -11,6 +12,7 @@ import com.personal.mall.product.entity.vo.spu.Bounds;
 import com.personal.mall.product.entity.vo.spu.MemberPrice;
 import com.personal.mall.product.entity.vo.spu.Skus;
 import com.personal.mall.product.feign.CouponFeignService;
+import com.personal.mall.product.feign.WareFeignService;
 import com.personal.mall.product.service.*;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -65,7 +67,10 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
     private BrandService brandService;
 
     @Autowired
-    CategoryService categoryService;
+    private CategoryService categoryService;
+
+    @Autowired
+    private WareFeignService wareFeignService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -223,6 +228,63 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         voiPage.setRecords(vos);
 
         return new PageUtils(voiPage);
+    }
+
+    @Override
+    public void up(Long spuId) {
+        ArrayList<SkuESModel> esModels = new ArrayList<>();
+
+        SpuInfoEntity spuInfo = this.getById(spuId);
+        String categoryName = categoryService.getById(spuInfo.getCatalogId()).getName();
+        BrandEntity brandEntity = brandService.getById(spuInfo.getBrandId());
+
+        // 获取sku信息
+        List<SkuInfoEntity> skuLists = skuInfoService.list(new QueryWrapper<SkuInfoEntity>()
+                .eq("spu_id", spuId));
+
+        // 获取商品属性信息
+        List<SkuESModel.Attrs> modelAttrs = getModelAttrs(spuId);
+
+        skuLists.forEach(s -> {
+
+            SkuESModel esModel = new SkuESModel();
+            esModel.setCatalogId(spuInfo.getCatalogId());
+            esModel.setBrandId(spuInfo.getBrandId());
+            esModel.setBrandImg(brandEntity.getLogo());
+            esModel.setCatalogName(categoryName);
+            esModel.setBrandName(brandEntity.getName());
+
+            esModel.setHotScore(0L);// 给一个默认值
+
+            esModel.setSkuId(s.getSkuId());
+            esModel.setSubTitle(s.getSkuSubtitle());
+            esModel.setSkuPrice(s.getPrice());
+            esModel.setSaleCount(s.getSaleCount());
+            esModel.setSkuImg(s.getSkuDefaultImg());
+
+            esModel.setAttrs(modelAttrs);
+
+            // 库存信息，商品是否有库存,sku_id
+            // sku_id列表
+            List<Long> skuIds = skuLists.stream().map(SkuInfoEntity::getSkuId).collect(Collectors.toList());
+            List<Long> skuStockLists = null;
+            try {
+                skuStockLists = wareFeignService.haveStock(skuIds);
+            }
+
+            esModels.add(esModel);
+        });
+
+    }
+
+    private List<SkuESModel.Attrs> getModelAttrs(Long spuId) {
+        List<ProductAttrValueEntity> productAttrs = attrValueService.list(new QueryWrapper<ProductAttrValueEntity>()
+                .eq("spu_id", spuId));
+        return productAttrs.stream().map(a -> {
+            SkuESModel.Attrs attrs = new SkuESModel.Attrs();
+            BeanUtils.copyProperties(a, attrs);
+            return attrs;
+        }).collect(Collectors.toList());
     }
 
 }
