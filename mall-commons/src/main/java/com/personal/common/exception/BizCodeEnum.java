@@ -19,7 +19,8 @@ package com.personal.common.exception;
 public enum BizCodeEnum {
 
     UNKNOW_EXCEPTION(10000,"系统未知异常"),
-    VALID_EXCEPTION(10001,"参数格式异常");
+    VALID_EXCEPTION(10001,"参数格式异常"),
+    PRODUCT_UP_EXCEPTION(11001,"上架商品保存到es有误");
 
     private Integer code;
     private String msg;

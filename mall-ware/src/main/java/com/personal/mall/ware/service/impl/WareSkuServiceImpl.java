@@ -91,7 +91,8 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
         ArrayList<Long> list = new ArrayList<>();
         skuIds.forEach(s -> {
             Integer stock = wareSkuDao.getStock(s);
-            if (stock > 0) {
+            // 说明有库存
+            if (stock != null && stock > 0) {
                 list.add(s);
             }
         });

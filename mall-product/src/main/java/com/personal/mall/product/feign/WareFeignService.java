@@ -2,6 +2,8 @@ package com.personal.mall.product.feign;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
@@ -13,6 +15,6 @@ import java.util.List;
  */
 @FeignClient("mall-ware")
 public interface WareFeignService {
-    @GetMapping("/ware/waresku/haveStock")
-    List<Long> haveStock(List<Long> skuIds);
+    @PostMapping("/ware/waresku/haveStock")
+    List<Long> haveStock(@RequestBody List<Long> skuIds);
 }

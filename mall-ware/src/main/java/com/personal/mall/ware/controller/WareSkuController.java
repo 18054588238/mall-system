@@ -30,11 +30,10 @@ public class WareSkuController {
     /**
      * 返回有库存的sku_id列表
      */
-    @GetMapping("/haveStock")
-    public List<Long> haveStock(List<Long> skuIds){
-        List<Long> skuStockIds = wareSkuService.haveStock(skuIds);
+    @PostMapping("/haveStock")
+    public List<Long> haveStock(@RequestBody List<Long> skuIds){
 
-        return skuStockIds;
+        return wareSkuService.haveStock(skuIds);
     }
 
     /**
