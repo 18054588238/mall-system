@@ -14,7 +14,7 @@ import java.util.List;
 public class Catalog2VO {
 
     private String catalog1Id; // 对应的一级分类编号
-    private List<Catalog3VO> catalog3VOList;// 对应的三级分类信息
+    private List<Catalog3VO> catalog3List;// 对应的三级分类信息
     private String id; // 二级分类编号
     private String name;
 

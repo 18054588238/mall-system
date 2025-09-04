@@ -7,8 +7,11 @@ import com.personal.mall.product.service.CategoryService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 
 import java.util.List;
+import java.util.Random;
 
 @SpringBootTest
 class MallProductApplicationTests {
@@ -19,15 +22,13 @@ class MallProductApplicationTests {
     @Autowired
     CategoryService categoryService;
 
+    @Autowired
+    StringRedisTemplate stringRedisTemplate;
+
     @Test
     void contextLoads() {
-//        List<BrandEntity> list = brandService.list(new QueryWrapper<BrandEntity>().eq("brand_id", 1));
-//        for (BrandEntity entity : list) {
-//            System.out.println(entity);
-//        }
-        Long[] path = categoryService.getCatelogPath(476l);
-        for (int i = 0; i < path.length; i++) {
-            System.out.println(path[i]);
+        for (int i = 0; i < 10; i++) {
+            System.out.println(new Random().nextInt(5));
         }
     }
 

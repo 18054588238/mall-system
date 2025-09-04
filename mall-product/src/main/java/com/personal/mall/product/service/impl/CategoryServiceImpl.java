@@ -1,12 +1,17 @@
 package com.personal.mall.product.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.personal.mall.product.entity.vo.Catalog2VO;
 import com.personal.mall.product.service.CategoryBrandRelationService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -20,12 +25,18 @@ import com.personal.mall.product.entity.CategoryEntity;
 import com.personal.mall.product.service.CategoryService;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
+
 
 @Service("categoryService")
 public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity> implements CategoryService {
 
     @Autowired
     CategoryBrandRelationService categoryBrandRelationService;
+
+    @Autowired
+    StringRedisTemplate stringRedisTemplate;
+
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<CategoryEntity> page = this.page(
@@ -78,20 +89,52 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     public List<CategoryEntity> getLevel1Category() {
         // 获取以及分类信息
         return this.list(new QueryWrapper<CategoryEntity>()
-                .eq("parent_cid",1));
+                .eq("parent_cid",0));
     }
 
     @Override
     public Map<String, List<Catalog2VO>> getCatalog2JSON() {
-        HashMap<String, List<Catalog2VO>> map = new HashMap<>();
+        // 解决缓存击穿：加锁，只允许一个请求查询数据库，其他等待，从缓存中取,数据存到缓存后再释放锁
+        /* 对于一些设置了过期时间的key，如果这些key在某些时间点被超高并发地访问，在大量请求同时进来前正好失效，
+         那么所有对这个key的数据查询都落到db */
+        String key = "catalog2JSON";
+        ValueOperations<String, String> ops = stringRedisTemplate.opsForValue();
+
+        /*redis实现分布式锁*/
+        Boolean lock = ops.setIfAbsent("lock", "111");// 有值，返回false
+        String catalog2JSON = ops.get(key);
+
+        // 如果缓存有，则从缓存中取, 否则，查库，再存到缓存中
+        if (StringUtils.isEmpty(catalog2JSON)) {
+            Map<String, List<Catalog2VO>> catalog2JSONDB = getCatalog2JSONDB();
+            // 存储到缓存中
+            // 解决缓存穿透问题
+            if (catalog2JSONDB == null) {
+                ops.set(key, "1",new Random().nextInt(5), TimeUnit.SECONDS);// 解决缓存雪崩，失效时间增加一个随机值
+            } else {
+                ops.set(key, JSON.toJSONString(catalog2JSONDB)); //
+            }
+            return catalog2JSONDB;
+        }
+        Map<String, List<Catalog2VO>> stringListMap = JSON.parseObject(catalog2JSON, new TypeReference<Map<String, List<Catalog2VO>>>() {
+        });
+        return stringListMap;
+    }
+
+    public Map<String, List<Catalog2VO>> getCatalog2JSONDB() {
+
+        Map<String, List<Catalog2VO>> map = new HashMap<>();
+        // 获取所有分类数据，已减少查询数据库的操作
+        List<CategoryEntity> categoryEntities = this.list();
         // 一级分类id
-        List<Long> level1Ids = this.getLevel1Category().stream()
+        List<Long> level1Ids = categoryEntities.stream()
+                .filter(i -> i.getParentCid() == 0)
                 .map(CategoryEntity::getCatId).collect(Collectors.toList());
         // 一级分类id和二级分类信息的映射
-        Map<Long, List<CategoryEntity>> level2InfosMap = getLevelInfos(2L);
+        Map<Long, List<CategoryEntity>> level2InfosMap = getLevelInfos(categoryEntities,2L);
 
         // 二级分类id和三级分类信息的映射
-        Map<Long, List<CategoryEntity>> level3InfosMap = getLevelInfos(3L);
+        Map<Long, List<CategoryEntity>> level3InfosMap = getLevelInfos(categoryEntities,3L);
 
         level1Ids.forEach(l1 -> {
             // 查询一级分类下的子类信息
@@ -121,7 +164,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
                                             return catalog3VO;
                                         }).collect(Collectors.toList());
                             }
-                            catalog2VO.setCatalog3VOList(catalog3VOS);
+                            catalog2VO.setCatalog3List(catalog3VOS);
 
                             return catalog2VO;
                         }).collect(Collectors.toList());
@@ -132,10 +175,9 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     }
 
     // 获取父级分类id和子类信息的映射
-    public Map<Long, List<CategoryEntity>> getLevelInfos(Long levelId) {
-
-        return this.list(new QueryWrapper<CategoryEntity>()
-                        .eq("cat_level", levelId)).stream()
+    public Map<Long, List<CategoryEntity>> getLevelInfos(List<CategoryEntity> categoryEntities,Long levelId) {
+        return categoryEntities.stream()
+                .filter(i -> i.getCatLevel() == levelId.intValue())
                 .collect(Collectors.groupingBy(CategoryEntity::getParentCid));
     }
 

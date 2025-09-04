@@ -47,3 +47,9 @@ spring:
             - Path=/app/**
           filters:
             - RewritePath=/app/?(?<segment>.*), /renren-fast/$\{segment} #重写请求路径，在捕获的路径前添加 /renren-fast/
+       # nginx负载均衡
+        - id: mallsystem_host_route
+          uri: lb://mall-product # 负载均衡
+          predicates:
+            - Host=mall.system.com
+
