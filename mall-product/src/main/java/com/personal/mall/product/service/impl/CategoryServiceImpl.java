@@ -6,6 +6,9 @@ import com.personal.mall.product.entity.vo.Catalog2VO;
 import com.personal.mall.product.service.CategoryBrandRelationService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
@@ -76,6 +79,14 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         return paths.toArray(new Long[paths.size()]);
     }
 
+    /*
+    @CacheEvict 表示在更新数据的同时删除缓存中的数据
+    allEntries = true 表示删除category分区下的所有缓存数据*/
+    /*@Caching(evict = {
+            @CacheEvict(value = "category",key = "'getLevel1Category'"),
+            @CacheEvict(value = "category",key = "'getCatalog2JSON'")
+    }) // 和下面的类似*/
+    @CacheEvict(value = "category",allEntries = true)
     @Transactional
     @Override
     public void updateDetail(CategoryEntity category) {
@@ -85,23 +96,38 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         }
     }
 
+    // 触发缓存保存
+    /* @Cacheable代表当前方法的返回结果是需要缓存的，如果缓存中有数据，那么该方法不会执行，否则执行方法，并将数据存到缓存中
+    * value = {"category","product"} 缓存分区作用，根据业务分区
+    * key = "#root.method.name" Spring Expression Language (SpEL) expression设置键值
+    * sync = true get方法加锁操作 ，分布式锁 本地锁 解决缓存击穿问题
+    * */
+    /*在同一个 @Cacheable 注解中同时指定了多个缓存名称（caches=[category, product]），
+    并且开启了同步功能（sync = true）。
+    这两个功能是互斥的*/
+    @Cacheable(value = {"category"},key = "#root.method.name",sync = true)
     @Override
     public List<CategoryEntity> getLevel1Category() {
+        System.out.println("一级分类，查询数据库......");
         // 获取以及分类信息
         return this.list(new QueryWrapper<CategoryEntity>()
                 .eq("parent_cid",0));
     }
 
+    @Cacheable(value = {"category"},key = "#root.method.name",sync = true)
     @Override
     public Map<String, List<Catalog2VO>> getCatalog2JSON() {
+        System.out.println("二级分类，查询数据库......");
+        return getCatalog2JSONDB();
+    }
+
+    public Map<String, List<Catalog2VO>> getCatalog2JSONRedis() {
         // 解决缓存击穿：加锁，只允许一个请求查询数据库，其他等待，从缓存中取,数据存到缓存后再释放锁
         /* 对于一些设置了过期时间的key，如果这些key在某些时间点被超高并发地访问，在大量请求同时进来前正好失效，
          那么所有对这个key的数据查询都落到db */
         String key = "catalog2JSON";
         ValueOperations<String, String> ops = stringRedisTemplate.opsForValue();
 
-        /*redis实现分布式锁*/
-        Boolean lock = ops.setIfAbsent("lock", "111");// 有值，返回false
         String catalog2JSON = ops.get(key);
 
         // 如果缓存有，则从缓存中取, 否则，查库，再存到缓存中
