@@ -10,7 +10,7 @@ spring:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
   thymeleaf:
-    cache: false # 关闭thymeleaf缓存
+    cache: false # 关闭thymeleaf缓存,不然热部署不起作用
   redis:
     host: 127.0.0.1
     port: 6379
