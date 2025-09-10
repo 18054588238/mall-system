@@ -13,6 +13,7 @@ public class SearchResult {
     private Integer pageNum; // 当前页
     private Long total; // 总记录数
     private Integer totalPages; // 总页数
+    private List<Integer> navs; //需要显示的分页的页码
 
     // 当前查询的所有商品所涉及到的所有
     // 品牌信息
