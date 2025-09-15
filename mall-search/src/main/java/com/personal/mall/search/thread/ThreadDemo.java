@@ -53,24 +53,31 @@ public class ThreadDemo {
                 new LinkedBlockingQueue<>(10000),
                 Executors.defaultThreadFactory(),
                 new ThreadPoolExecutor.AbortPolicy());
+
         CompletableFuture.runAsync(() -> {
             System.out.println("CompletableFuture--void--start");
             int i = 200/20;
             System.out.println("CompletableFuture--void--end");
         },poolExecutor);
 
+        // 返回结果
         CompletableFuture<Integer> future = CompletableFuture.supplyAsync(() -> {
             System.out.println("CompletableFuture--return--start");
             int i = 200 / 20;
             System.out.println("CompletableFuture--return--end");
             return i;
-        }, poolExecutor);
+        }, poolExecutor).handle((res,exec) -> {
+            System.out.println("res----->"+res+";exec------>"+exec);
+            return res*10;
+        });
         System.out.println("返回结果："+future.get());
 
         poolExecutor.allowCoreThreadTimeOut(true);
         poolExecutor.execute(() -> {
             System.out.println("pool2 ------> "+Thread.currentThread().getName());
         });
+
+
 
     }
 }
