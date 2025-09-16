@@ -32,8 +32,7 @@ class MallProductApplicationTests {
 
     @Test
     void contextLoads() {
-        ItemVO item = skuInfoService.item(6l);
-        System.out.println(item);
+
     }
 
 }

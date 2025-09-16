@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.personal.mall</groupId>
-    <artifactId>mall-search</artifactId>
+    <artifactId>mall-auth</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>mall-search</name>
-    <description>检索服务</description>
+    <name>mall-auth</name>
+    <description>认证服务</description>
 
     <properties>
         <java.version>1.8</java.version>

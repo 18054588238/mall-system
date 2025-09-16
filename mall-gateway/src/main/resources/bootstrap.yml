@@ -60,3 +60,7 @@ spring:
           uri: lb://mall-search # 负载均衡
           predicates:
             - Host=mall.search.com
+        - id: mallsystem_host_route4
+          uri: lb://mall-auth # 负载均衡
+          predicates:
+            - Host=mall.auth.com
