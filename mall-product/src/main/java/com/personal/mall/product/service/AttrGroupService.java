@@ -6,6 +6,7 @@ import com.personal.mall.product.entity.AttrEntity;
 import com.personal.mall.product.entity.AttrGroupEntity;
 import com.personal.mall.product.entity.vo.AttrGroupWithAttrsVO;
 import com.personal.mall.product.entity.vo.AttrRelaDelVO;
+import com.personal.mall.product.entity.vo.SpuItemGroupAttrVO;
 
 import java.util.List;
 import java.util.Map;
@@ -28,5 +29,7 @@ public interface AttrGroupService extends IService<AttrGroupEntity> {
     void deleteRelaAtrr(AttrRelaDelVO[] attrRelaDelVO);
 
     List<AttrGroupWithAttrsVO> getWithattr(Long catalogId);
+
+    List<SpuItemGroupAttrVO> getGroupAttr(Long spuId, Long catalogId);
 }
 

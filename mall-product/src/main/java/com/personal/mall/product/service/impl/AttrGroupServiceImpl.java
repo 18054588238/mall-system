@@ -6,6 +6,7 @@ import com.personal.mall.product.entity.AttrAttrgroupRelationEntity;
 import com.personal.mall.product.entity.AttrEntity;
 import com.personal.mall.product.entity.vo.AttrGroupWithAttrsVO;
 import com.personal.mall.product.entity.vo.AttrRelaDelVO;
+import com.personal.mall.product.entity.vo.SpuItemGroupAttrVO;
 import com.personal.mall.product.service.AttrService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -34,6 +35,8 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
 
     @Autowired
     private AttrAttrgroupRelationDao relationDao;
+    @Autowired
+    private AttrGroupDao attrGroupDao;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -115,5 +118,10 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
             withAttrsVOS.add(groupWithAttrsVO);
         });
         return withAttrsVOS;
+    }
+
+    @Override
+    public List<SpuItemGroupAttrVO> getGroupAttr(Long spuId, Long catalogId) {
+        return attrGroupDao.getGroupAttr(spuId,catalogId);
     }
 }

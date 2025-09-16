@@ -2,8 +2,10 @@ package com.personal.mall.product;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.personal.mall.product.entity.BrandEntity;
+import com.personal.mall.product.entity.vo.ItemVO;
 import com.personal.mall.product.service.BrandService;
 import com.personal.mall.product.service.CategoryService;
+import com.personal.mall.product.service.SkuInfoService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,12 +27,13 @@ class MallProductApplicationTests {
 
     @Autowired
     StringRedisTemplate stringRedisTemplate;
+    @Autowired
+    SkuInfoService skuInfoService;
 
     @Test
     void contextLoads() {
-        for (int i = 0; i < 10; i++) {
-            System.out.println(new Random().nextInt(5));
-        }
+        ItemVO item = skuInfoService.item(6l);
+        System.out.println(item);
     }
 
 }
