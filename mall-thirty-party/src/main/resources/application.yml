@@ -16,3 +16,15 @@ spring:
         server-addr: 127.0.0.1:8848
   application:
     name: mall-thirty
+  mail:
+    host: smtp.qq.com
+    port: 587
+    username: 2841043978@qq.com
+    password: ommokdlxiipldfcf
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true

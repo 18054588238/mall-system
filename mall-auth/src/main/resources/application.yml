@@ -9,3 +9,6 @@ spring:
     name: mall-auth
   thymeleaf:
     cache: false # 关闭缓存，不然热部署不起作用
+  redis:
+    port: 6379
+    host: 127.0.0.1
