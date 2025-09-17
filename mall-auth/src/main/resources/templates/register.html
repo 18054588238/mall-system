@@ -5012,7 +5012,7 @@ Cookie</span>是由网页服务器存放在您的访问设备上的文本文件�
 			<form action="" class="one">
 				<div class="register-box">
 					<label for="username" class="username_label">用 户 名
-			<input maxlength="20" type="text" placeholder="您的用户名和登录名" >
+						<input maxlength="20" type="text" placeholder="您的用户名和登录名" >
 					</label>
 					<div class="tips">
 
@@ -5020,34 +5020,34 @@ Cookie</span>是由网页服务器存放在您的访问设备上的文本文件�
 				</div>
 				<div class="register-box">
 					<label for="username" class="other_label">设 置 密 码
-			<input maxlength="20" type="password" placeholder="建议至少使用两种字符组合">
-			</label>
+						<input maxlength="20" type="password" placeholder="建议至少使用两种字符组合">
+					</label>
 					<div class="tips">
 
 					</div>
 				</div>
 				<div class="register-box">
 					<label for="username" class="other_label">确 认 密 码
-			<input maxlength="20" type="password" placeholder="请再次输入密码">
-			</label>
+						<input maxlength="20" type="password" placeholder="请再次输入密码">
+					</label>
 					<div class="tips">
 
 					</div>
 				</div>
 				<div class="register-box">
 					<label for="username" class="other_label">
-			<span>中国 0086∨</span>
-			<input class="phone" maxlength="20" type="text" placeholder="建议使用常用手机">
-			</label>
+						<span>中国 0086∨</span>
+						<input class="phone" maxlength="20" type="text" placeholder="建议使用常用手机">
+					</label>
 					<div class="tips">
 
 					</div>
 				</div>
 				<div class="register-box">
 					<label for="username" class="other_label">验 证 码
-			<input maxlength="20" type="text" placeholder="请输入验证码" class="caa">
-			</label>
-					<span id="code"></span>
+						<input maxlength="20" type="text" placeholder="请输入验证码" class="caa">
+					</label>
+					<a href="#" id="sendCode">点击发送验证码</a>
 					<div class="tips">
 
 					</div>
@@ -5302,6 +5302,30 @@ Cookie</span>是由网页服务器存放在您的访问设备上的文本文件�
 			$(".cuo").click(function() {
 				$(".zong").hide();
 			});
+
+			$(function (){
+				$("#sendCode").click(function () {
+					if ($(this).hasClass("d1")) {
+						// 说明正在倒计时
+					} else {
+						timeoutChangeStyle()
+					}
+				})
+			})
+			var num = 60
+			function timeoutChangeStyle() {
+				$("#sendCode").attr("class","d1")
+				if (num == 0) {
+					// 说明1min到了
+					$("#sendCode").text("发送验证码")
+					num = 60;
+					$("#sendCode").attr("class","")
+				} else {
+					setTimeout('timeoutChangeStyle()',1000)
+					$("#sendCode").text(num+"s后再次发送")
+				}
+				num--;
+			}
 		</script>
 	</body>
 
