@@ -5011,52 +5011,52 @@ Cookie</span>是由网页服务器存放在您的访问设备上的文本文件�
 		<section>
 			<form action="" class="one">
 				<div class="register-box">
-					<label for="username" class="username_label">用 户 名
-						<input maxlength="20" type="text" placeholder="您的用户名和登录名" >
+					<label class="username_label">用 户 名
+						<input name="username" maxlength="20" type="text" placeholder="您的用户名和登录名" >
+					</label>
+					<div class="tips" th:text="${error!=null&&#maps.containsKey(error,'username')?error.username:''}">
+
+					</div>
+				</div>
+				<div class="register-box">
+					<label class="other_label">设 置 密 码
+						<input name="password" maxlength="20" type="password" placeholder="建议至少使用两种字符组合">
+					</label>
+					<div class="tips" th:text="${error!=null&&#maps.containsKey(error,'password')?error.password:''}">
+
+					</div>
+				</div>
+				<div class="register-box">
+					<label class="other_label">确 认 密 码
+						<input name="rePassword" maxlength="20" type="password" placeholder="请再次输入密码">
 					</label>
 					<div class="tips">
 
 					</div>
 				</div>
 				<div class="register-box">
-					<label for="username" class="other_label">设 置 密 码
-						<input maxlength="20" type="password" placeholder="建议至少使用两种字符组合">
-					</label>
-					<div class="tips">
-
-					</div>
-				</div>
-				<div class="register-box">
-					<label for="username" class="other_label">确 认 密 码
-						<input maxlength="20" type="password" placeholder="请再次输入密码">
-					</label>
-					<div class="tips">
-
-					</div>
-				</div>
-				<div class="register-box">
-					<label for="username" class="other_label">
+					<label class="other_label">
 						<span>中国 0086∨</span>
-						<input class="phone" maxlength="20" type="text" placeholder="建议使用常用手机">
+						<input name="phone" class="phone" maxlength="20" type="text" placeholder="建议使用常用手机">
 					</label>
-					<div class="tips">
+					<div class="tips" th:text="${error!=null&&#maps.containsKey(error,'phone')?error.phone:''}">
 
 					</div>
 				</div>
 				<div class="register-box">
-					<label for="email" class="other_label">邮箱
-						<input class="email" id="emailNum" maxlength="30" type="text" placeholder="请输入邮箱">
+					<label class="other_label">邮箱
+						<input name="email" class="email" id="emailNum" maxlength="30" type="text" placeholder="请输入邮箱">
 					</label>
-					<div class="tips">
+					<div class="tips" th:text="${error!=null&&#maps.containsKey(error,'email')?error.email:''}">
 
 					</div>
 				</div>
 				<div class="register-box">
-					<label for="username" class="other_label">验 证 码
-						<input maxlength="20" type="text" placeholder="请输入验证码" class="caa">
+					<label class="other_label">验 证 码
+						<input name="code" maxlength="10" type="text" placeholder="请输入验证码" class="caa">
 					</label>
 					<a href="#" id="sendCode">点击发送验证码</a>
-					<div class="tips">
+					<div class="tips" th:text="${error!=null&&#maps.containsKey(error,'code')?error.code:''}">
 
 					</div>
 				</div>

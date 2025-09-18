@@ -4,13 +4,19 @@ import com.personal.common.constant.MailConstant;
 import com.personal.common.exception.BizCodeEnum;
 import com.personal.common.utils.R;
 import com.personal.mall.auth.feign.ThirtyPartyFeignService;
+import com.personal.mall.auth.vo.RegisterUserVO;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -42,6 +48,47 @@ public class AuthController {
         // 将验证码存到缓存中
         redisTemplate.opsForValue().set(prefix + to ,code+"_"+System.currentTimeMillis(),5, TimeUnit.MINUTES);
         return R.ok();
+    }
+
+    @PostMapping("/auth/register")
+    public String register(@RequestBody @Valid RegisterUserVO vo, BindingResult result, Model model) {
+        // 校验注册页面输入数据是否合法
+        boolean b = registerValid(result,model,vo);
+        // 校验不通过，返回注册页面
+        if (!b) {
+            return "/register";
+        }
+        // 校验通过，进行注册服务
+
+
+        return "";
+    }
+
+    // 与前端交互，校验注册页面输入数据是否合法，BindingResult 可以获取哪些字段校验错误及错误信息，通过Model将校验错误的返回给前端
+    private boolean registerValid(BindingResult result, Model model,RegisterUserVO vo) {
+        HashMap<String, String> map = new HashMap<>();
+        if (result.hasFieldErrors()) {
+
+            List<FieldError> fieldErrors = result.getFieldErrors();
+            for (FieldError fieldError : fieldErrors) {
+                map.put(fieldError.getField(),fieldError.getDefaultMessage());
+            }
+            model.addAttribute("error",map);
+            return false;
+        }
+        // 校验验证码
+        String code = vo.getCode();
+        String s = redisTemplate.opsForValue().get(MailConstant.MAIL_CODE_PREFIX + vo.getEmail());
+        if (StringUtils.isNotBlank(s) && s.split("_")[0].equalsIgnoreCase(code)) {
+            // 验证码正确，删除缓存
+            redisTemplate.delete(MailConstant.MAIL_CODE_PREFIX + vo.getEmail());
+            return true;
+        } else {
+            // 验证码不正确，返回错误信息
+            map.put("code","验证码错误");
+            model.addAttribute("error",map);
+            return false;
+        }
     }
 
     private String generateCode() {
