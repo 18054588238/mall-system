@@ -3,7 +3,10 @@ package com.personal.mall.member.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.personal.common.exception.BizCodeEnum;
 import com.personal.mall.member.entity.vo.RegisterVO;
+import com.personal.mall.member.exception.PhoneExsitExecption;
+import com.personal.mall.member.exception.UsernameExsitExecption;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,7 +32,16 @@ public class MemberController {
 
     @PostMapping("/register")
     public R register(@RequestBody RegisterVO vo) {
-        memberService.register(vo);
+
+        try {
+            memberService.register(vo);
+        } catch (PhoneExsitExecption phoneExsitExecption) {
+            return R.error(BizCodeEnum.PHONE_EXSIT_EXCEPTION.getCode(), BizCodeEnum.PHONE_EXSIT_EXCEPTION.getMsg());
+        } catch (UsernameExsitExecption usernameExsitExecption) {
+            return R.error(BizCodeEnum.USERNAME_EXSIT_EXCEPTION.getCode(),  BizCodeEnum.USERNAME_EXSIT_EXCEPTION.getMsg());
+        } catch (Exception e) {
+            return R.error(BizCodeEnum.UNKNOW_EXCEPTION.getCode(),  BizCodeEnum.UNKNOW_EXCEPTION.getMsg());
+        }
         return R.ok();
     }
 

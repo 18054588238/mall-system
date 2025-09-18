@@ -5009,7 +5009,10 @@ Cookie</span>是由网页服务器存放在您的访问设备上的文本文件�
 			</div>
 		</header>
 		<section>
-			<form action="" class="one">
+			<form action="/auth/register" method="post" class="one">
+				<div class="tips" th:text="${error!=null&&#maps.containsKey(error,'msg')?error.msg:''}">
+
+				</div>
 				<div class="register-box">
 					<label class="username_label">用 户 名
 						<input name="username" maxlength="20" type="text" placeholder="您的用户名和登录名" >
@@ -5081,7 +5084,7 @@ Cookie</span>是由网页服务器存放在您的访问设备上的文本文件�
 					<span>企业用户注册</span>
 				</div>
 				<div class="right_r2">
-					<img src="/static/reg//static/reg/img/a65a18e877a16246a92e1b755bd88a03_06.png"/>
+					<img src="/static/reg/img/a65a18e877a16246a92e1b755bd88a03_06.png"/>
 					<span>INTERNATIONAL <br /> CUSTOMERS</span>
 				</div>
 			</div>
@@ -5253,7 +5256,7 @@ Cookie</span>是由网页服务器存放在您的访问设备上的文本文件�
 						}
 					})
 					//	提交按钮
-				$("#submit_btn").click(function(e) {
+				/*$("#submit_btn").click(function(e) {
 					for(var j = 0; j < 5; j++) {
 						if($('input').eq(j).val().length == 0) {
 							$('input').eq(j).focus();
@@ -5283,7 +5286,7 @@ Cookie</span>是由网页服务器存放在您的访问设备上的文本文件�
 						e.preventDefault();
 						return;
 					}
-				})
+				})*/
 
 				//  建立构造函数，构造学生信息模板
 				function Student(name, password, tel, id) {

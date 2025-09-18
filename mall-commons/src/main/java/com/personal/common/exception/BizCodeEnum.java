@@ -14,14 +14,17 @@ package com.personal.common.exception;
 > /002:未知异常 10002
 > 11：商品
 > 12：订单
-> 13：物流
-> 14：会员*/
+> 13：购物车
+> 14：物流
+> 15：会员*/
 public enum BizCodeEnum {
 
     UNKNOW_EXCEPTION(10000,"系统未知异常"),
     VALID_EXCEPTION(10001,"参数格式异常"),
     VALID_MAIL_EXCEPTION(10002,"邮箱发送频率太高，稍等一会发送!"),
-    PRODUCT_UP_EXCEPTION(11001,"上架商品保存到es有误");
+    PRODUCT_UP_EXCEPTION(11001,"上架商品保存到es有误"),
+    USERNAME_EXSIT_EXCEPTION(15001,"用户名已存在"),
+    PHONE_EXSIT_EXCEPTION(15002,"手机号已存在");
 
     private Integer code;
     private String msg;

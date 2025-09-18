@@ -3,6 +3,7 @@ package com.personal.mall.auth.controller;
 import com.personal.common.constant.MailConstant;
 import com.personal.common.exception.BizCodeEnum;
 import com.personal.common.utils.R;
+import com.personal.mall.auth.feign.MemberServiceFeign;
 import com.personal.mall.auth.feign.ThirtyPartyFeignService;
 import com.personal.mall.auth.vo.RegisterUserVO;
 import org.apache.commons.lang.StringUtils;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -27,6 +29,8 @@ public class AuthController {
     private ThirtyPartyFeignService thirtyPartyFeignService;
     @Autowired
     private StringRedisTemplate redisTemplate;
+    @Autowired
+    private MemberServiceFeign memberServiceFeign;
 
     @ResponseBody
     @GetMapping("/send/mail")
@@ -51,22 +55,29 @@ public class AuthController {
     }
 
     @PostMapping("/auth/register")
-    public String register(@RequestBody @Valid RegisterUserVO vo, BindingResult result, Model model) {
+    public String register(@Valid RegisterUserVO vo, BindingResult result, Model model) {
+        Map<String, String> map = new HashMap<>();
         // 校验注册页面输入数据是否合法
-        boolean b = registerValid(result,model,vo);
+        boolean b = registerValid(result,model,vo,map);
         // 校验不通过，返回注册页面
         if (!b) {
             return "/register";
         }
         // 校验通过，进行注册服务
+        R register = memberServiceFeign.register(vo);
+        if (register.getCode() != 0) {
+            // 注册失败。返回错误信息
+            map.put("msg",register.getMessage(register.getCode()));
+            model.addAttribute("error",map);
+            return "/register";
+        }
 
-
-        return "";
+        return "redirect:http://mall.auth.com/login";
     }
 
     // 与前端交互，校验注册页面输入数据是否合法，BindingResult 可以获取哪些字段校验错误及错误信息，通过Model将校验错误的返回给前端
-    private boolean registerValid(BindingResult result, Model model,RegisterUserVO vo) {
-        HashMap<String, String> map = new HashMap<>();
+    private boolean registerValid(BindingResult result, Model model,RegisterUserVO vo,Map<String, String> map ) {
+
         if (result.hasFieldErrors()) {
 
             List<FieldError> fieldErrors = result.getFieldErrors();

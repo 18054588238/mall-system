@@ -2,8 +2,11 @@ package com.personal.mall.member.service.impl;
 
 import com.personal.mall.member.entity.MemberLevelEntity;
 import com.personal.mall.member.entity.vo.RegisterVO;
+import com.personal.mall.member.exception.PhoneExsitExecption;
+import com.personal.mall.member.exception.UsernameExsitExecption;
 import com.personal.mall.member.service.MemberLevelService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
@@ -38,15 +41,30 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
     @Override
     public void register(RegisterVO vo) {
         MemberEntity member = new MemberEntity();
-        levelService.list(new QueryWrapper<MemberLevelEntity>().eq("",))
-        member.setLevelId();
+        MemberLevelEntity defaultLevel = levelService.getDefaultLevel();
+        member.setLevelId(defaultLevel.getId());
+        // 账号和手机号的重复性校验
+        verifyNameAndPhone(vo.getUsername(),vo.getPhone());
         member.setUsername(vo.getUsername());
-
         member.setMobile(vo.getPhone());
         member.setEmail(vo.getEmail());
         member.setCreateTime(LocalDate.now());
         // 加密 BcryptPasswordEncoder
-        member.setPassword(vo.getPassword());
+        String encode = new BCryptPasswordEncoder().encode(vo.getPassword());
+        member.setPassword(encode);
+        this.save(member);
+    }
+
+    private void verifyNameAndPhone(String username, String phone) {
+        long nameCount = this.count(new QueryWrapper<MemberEntity>().eq("username", username));
+        long phoneCount = this.count(new QueryWrapper<MemberEntity>().eq("mobile", phone));
+        if (nameCount > 0) {
+            throw new UsernameExsitExecption("用户名已存在");
+        }
+        if (phoneCount > 0) {
+            // 抛出异常，响应给前端
+            throw new PhoneExsitExecption("手机号已存在");
+        }
     }
 
 }
