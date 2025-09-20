@@ -24,7 +24,8 @@ public enum BizCodeEnum {
     VALID_MAIL_EXCEPTION(10002,"邮箱发送频率太高，稍等一会发送!"),
     PRODUCT_UP_EXCEPTION(11001,"上架商品保存到es有误"),
     USERNAME_EXSIT_EXCEPTION(15001,"用户名已存在"),
-    PHONE_EXSIT_EXCEPTION(15002,"手机号已存在");
+    PHONE_EXSIT_EXCEPTION(15002,"手机号已存在"),
+    USERINFO_NOT_EXSIT_EXCEPTION(15003,"账号或密码输入有误，请重新输入");
 
     private Integer code;
     private String msg;

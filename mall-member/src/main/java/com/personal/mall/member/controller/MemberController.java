@@ -3,7 +3,10 @@ package com.personal.mall.member.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.alibaba.fastjson.JSON;
 import com.personal.common.exception.BizCodeEnum;
+import com.personal.mall.member.entity.vo.AuthResponseVO;
+import com.personal.mall.member.entity.vo.LoginVO;
 import com.personal.mall.member.entity.vo.RegisterVO;
 import com.personal.mall.member.exception.PhoneExsitExecption;
 import com.personal.mall.member.exception.UsernameExsitExecption;
@@ -29,6 +32,24 @@ import com.personal.common.utils.R;
 public class MemberController {
     @Autowired
     private MemberService memberService;
+
+
+    @RequestMapping("/oauth2/login")
+    public R oauthLogin(@RequestBody AuthResponseVO vo) throws Exception {
+        MemberEntity entity = memberService.oauthLogin(vo);
+        return R.ok().put("entity", JSON.toJSONString(entity));
+    }
+
+    @PostMapping("/login")
+    public R login(@RequestBody LoginVO vo) {
+        MemberEntity entity = memberService.login(vo);
+        if (entity!=null) {
+            return R.ok();
+        } else {
+            // 登录失败，返回错误信息给前端
+            return R.error(BizCodeEnum.USERINFO_NOT_EXSIT_EXCEPTION.getCode(), BizCodeEnum.USERINFO_NOT_EXSIT_EXCEPTION.getMsg());
+        }
+    }
 
     @PostMapping("/register")
     public R register(@RequestBody RegisterVO vo) {

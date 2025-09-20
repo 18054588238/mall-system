@@ -5,6 +5,7 @@ import com.personal.common.exception.BizCodeEnum;
 import com.personal.common.utils.R;
 import com.personal.mall.auth.feign.MemberServiceFeign;
 import com.personal.mall.auth.feign.ThirtyPartyFeignService;
+import com.personal.mall.auth.vo.LoginUserVO;
 import com.personal.mall.auth.vo.RegisterUserVO;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 import java.util.HashMap;
@@ -61,9 +63,10 @@ public class AuthController {
         boolean b = registerValid(result,model,vo,map);
         // 校验不通过，返回注册页面
         if (!b) {
+            model.addAttribute("error",map);
             return "/register";
         }
-        // 校验通过，进行注册服务
+        // 验证码和表单 校验通过，进行注册服务
         R register = memberServiceFeign.register(vo);
         if (register.getCode() != 0) {
             // 注册失败。返回错误信息
@@ -71,8 +74,20 @@ public class AuthController {
             model.addAttribute("error",map);
             return "/register";
         }
-
+        // 注册成功，跳转到登录页
         return "redirect:http://mall.auth.com/login";
+    }
+
+    @PostMapping("/login")
+    public String login(@RequestBody LoginUserVO vo, RedirectAttributes redirectAttributes) {
+        // 通过openfeign调用远程地址进行登录验证
+        R r = memberServiceFeign.login(vo);
+        if (r.getCode() != 0) {
+            redirectAttributes.addAttribute("errors",r.getMessage(r.getCode()));
+            return "redirect:http://mall.auth.com/login";
+        }
+        // 跳转到首页
+        return "redirect:http://mall.system.com/index.html";
     }
 
     // 与前端交互，校验注册页面输入数据是否合法，BindingResult 可以获取哪些字段校验错误及错误信息，通过Model将校验错误的返回给前端
@@ -84,7 +99,7 @@ public class AuthController {
             for (FieldError fieldError : fieldErrors) {
                 map.put(fieldError.getField(),fieldError.getDefaultMessage());
             }
-            model.addAttribute("error",map);
+//            model.addAttribute("error",map);
             return false;
         }
         // 校验验证码
@@ -97,7 +112,7 @@ public class AuthController {
         } else {
             // 验证码不正确，返回错误信息
             map.put("code","验证码错误");
-            model.addAttribute("error",map);
+//            model.addAttribute("error",map);
             return false;
         }
     }
