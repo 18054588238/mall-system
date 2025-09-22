@@ -1,11 +1,13 @@
 package com.personal.mall.auth.feign;
 
 import com.personal.common.utils.R;
+import com.personal.mall.auth.vo.AuthResponseVO;
 import com.personal.mall.auth.vo.LoginUserVO;
 import com.personal.mall.auth.vo.RegisterUserVO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @FeignClient("mall-member")
 public interface MemberServiceFeign {
@@ -15,5 +17,8 @@ public interface MemberServiceFeign {
 
     @PostMapping("/member/member/login")
     public R login(@RequestBody LoginUserVO vo);
+
+    @RequestMapping("/member/member/oauth2/login")
+    public R oauthLogin(@RequestBody AuthResponseVO vo);
 
 }

@@ -91,7 +91,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
 
     // weibo社交平台登录实现
     @Override
-    public MemberEntity oauthLogin(AuthResponseVO vo) throws Exception {
+    public MemberEntity oauthLogin(AuthResponseVO vo) {
         /*两种情况：
         * 1. 第一次社交登录，需要先注册
         * 2. 非首次社交登录，更新社交平台token信息
@@ -104,33 +104,39 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
             this.updateById(entity);
             return entity;
         }
+
         // 新增
         MemberEntity memberEntity = new MemberEntity();
         memberEntity.setSocialUid(vo.getUid());
         memberEntity.setExpiresIn(vo.getExpiresIn());
         memberEntity.setAccessToken(vo.getAccessToken());
-
-        // 获取社交平台的用户信息
-        Map<String, String> map = new HashMap<>();
-        HttpResponse resUserInfo = HttpUtils.doGet("https://api.weibo.com",
-                "/2/users/show.json",
-                "get",
-                null,
-                map
-        );
-        int statusCode = resUserInfo.getStatusLine().getStatusCode();
-        if (statusCode != 200) {
-            // 查询失败
+        try {
+            Map<String, String> querys = new HashMap<>();
+            querys.put("access_token",vo.getAccessToken());
+            querys.put("uid",vo.getUid());
+            // 获取社交平台的用户信息
+            HttpResponse resUserInfo = HttpUtils.doGet("https://api.weibo.com",
+                    "/2/users/show.json",
+                    "get",
+                    new HashMap<>(),
+                    querys
+            );
+            int statusCode = resUserInfo.getStatusLine().getStatusCode();
+            if (statusCode == 200) {
+                HttpEntity userInfoEntity = resUserInfo.getEntity();
+                String string = EntityUtils.toString(userInfoEntity);
+                JSONObject jsonObject = JSON.parseObject(string);
+                String screenName = jsonObject.getString("screen_name");// 昵称
+                String gender = jsonObject.getString("gender");// m：男、f：女、n：未知
+                String imageUrl = jsonObject.getString("profile_image_url");// 头像url
+                memberEntity.setNickname(screenName);
+                memberEntity.setGender(Objects.equals(gender, "m") ? 1:0);
+                memberEntity.setHeader(imageUrl);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        HttpEntity userInfoEntity = resUserInfo.getEntity();
-        String string = EntityUtils.toString(userInfoEntity);
-        JSONObject jsonObject = JSON.parseObject(string);
-        String screenName = jsonObject.getString("screen_name");// 昵称
-        String gender = jsonObject.getString("gender");// m：男、f：女、n：未知
-        String imageUrl = jsonObject.getString("profile_image_url");// 头像url
-        memberEntity.setNickname(screenName);
-        memberEntity.setGender(Objects.equals(gender, "m") ? 1:0);
-        memberEntity.setHeader(imageUrl);
+        this.save(memberEntity);
         return memberEntity;
     }
 

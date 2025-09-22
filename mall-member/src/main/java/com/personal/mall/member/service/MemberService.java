@@ -24,6 +24,6 @@ public interface MemberService extends IService<MemberEntity> {
 
     MemberEntity login(LoginVO vo);
 
-    MemberEntity oauthLogin(AuthResponseVO vo) throws Exception;
+    MemberEntity oauthLogin(AuthResponseVO vo);
 }
 

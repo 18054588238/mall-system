@@ -35,7 +35,7 @@ public class MemberController {
 
 
     @RequestMapping("/oauth2/login")
-    public R oauthLogin(@RequestBody AuthResponseVO vo) throws Exception {
+    public R oauthLogin(@RequestBody AuthResponseVO vo) {
         MemberEntity entity = memberService.oauthLogin(vo);
         return R.ok().put("entity", JSON.toJSONString(entity));
     }
