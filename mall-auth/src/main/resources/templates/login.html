@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 	<head>
 		<meta charset="utf-8" />
 		<link rel="stylesheet" type="text/css" href="/static/login/JD_sass/JD1.css" />
@@ -57,7 +57,7 @@
 						<div></div>
 						请输入账户名和密码
 					</div>
-					<form action="/login" method="post">
+					<form action="/auth/login" method="post">
 						<div class="tips" th:text="${errors}">
 
 						</div>
@@ -86,7 +86,7 @@
 							</a>
 						</li>
 						<li>
-							<a href="https://api.weibo.com/oauth2/authorize?client_id=&response_type=code&redirect_uri=http://mall.auth.com/oauth2/weibo/redirectUri">
+							<a href="https://api.weibo.com/oauth2/authorize?client_id=&response_type=code&redirect_uri=http://auth.mall.com/oauth2/weibo/redirectUri">
 								<img style="width: 50px;height: 18px" src="/static/login/JD_img/weibo.png" />
 							</a>
 						</li>
@@ -100,7 +100,7 @@
 					</ul>
 					<h5 class="rig">
 						<img src="/static/login/JD_img/4de5019d2404d347897dee637895d02b_25.png" />
-						<span><a href="http://mall.auth.com/register">立即注册</a></span>
+						<span><a href="http://auth.mall.com/register">立即注册</a></span>
 					</h5>
 				</div>
 			</div>
@@ -159,7 +159,7 @@
 		var err_img1 = document.getElementsByClassName('err_img1')[0];
 		var err_img2 = document.getElementsByClassName('err_img2')[0];
 
-		btn2.onclick = function() {
+		/*btn2.onclick = function() {
 			if (user.value == '' || pass.value == '') {
 				err.style.display = 'block';
 				user.style.border = '1px solid red';
@@ -185,6 +185,6 @@
 				err_img2.src = '/static/login/JD_img/img22.png';
 				pass.style.border = '1px solid red';
 			}
-		}
+		}*/
 	</script>
 </html>

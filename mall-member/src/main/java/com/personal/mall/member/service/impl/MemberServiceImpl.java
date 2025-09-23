@@ -52,13 +52,15 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
     }
 
     @Override
-    public void register(RegisterVO vo) {
+    public void register(RegisterVO vo) throws PhoneExsitExecption, UsernameExsitExecption {
         MemberEntity member = new MemberEntity();
         MemberLevelEntity defaultLevel = levelService.getDefaultLevel();
+        System.out.println("defaultLevel:"+defaultLevel);
         member.setLevelId(defaultLevel.getId());
         // 账号和手机号的重复性校验
         verifyNameAndPhone(vo.getUsername(),vo.getPhone());
         member.setUsername(vo.getUsername());
+        member.setNickname(vo.getUsername());
         member.setMobile(vo.getPhone());
         member.setEmail(vo.getEmail());
         member.setCreateTime(LocalDate.now());
@@ -144,9 +146,11 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
         long nameCount = this.count(new QueryWrapper<MemberEntity>().eq("username", username));
         long phoneCount = this.count(new QueryWrapper<MemberEntity>().eq("mobile", phone));
         if (nameCount > 0) {
+            System.out.println("nameCount"+nameCount);
             throw new UsernameExsitExecption("用户名已存在");
         }
         if (phoneCount > 0) {
+            System.out.println("phoneCount"+phoneCount);
             // 抛出异常，响应给前端
             throw new PhoneExsitExecption("手机号已存在");
         }

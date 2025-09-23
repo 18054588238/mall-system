@@ -51,16 +51,16 @@ spring:
         - id: mallsystem_host_route1
           uri: lb://mall-product # 负载均衡
           predicates:
-            - Host=mall.system.com
+            - Host=system.mall.com
         - id: mallsystem_host_route2
           uri: lb://mall-product # 负载均衡
           predicates:
-            - Host=mall.item.com
+            - Host=item.mall.com
         - id: mallsystem_host_route3
           uri: lb://mall-search # 负载均衡
           predicates:
-            - Host=mall.search.com
+            - Host=search.mall.com
         - id: mallsystem_host_route4
           uri: lb://mall-auth # 负载均衡
           predicates:
-            - Host=mall.auth.com
+            - Host=auth.mall.com

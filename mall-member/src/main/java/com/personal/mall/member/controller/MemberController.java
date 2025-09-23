@@ -44,7 +44,7 @@ public class MemberController {
     public R login(@RequestBody LoginVO vo) {
         MemberEntity entity = memberService.login(vo);
         if (entity!=null) {
-            return R.ok();
+            return R.ok().put("entity", JSON.toJSONString(entity));
         } else {
             // 登录失败，返回错误信息给前端
             return R.error(BizCodeEnum.USERINFO_NOT_EXSIT_EXCEPTION.getCode(), BizCodeEnum.USERINFO_NOT_EXSIT_EXCEPTION.getMsg());
@@ -52,7 +52,7 @@ public class MemberController {
     }
 
     @PostMapping("/register")
-    public R register(@RequestBody RegisterVO vo) {
+    public R register(@RequestBody RegisterVO vo) throws PhoneExsitExecption, UsernameExsitExecption {
 
         try {
             memberService.register(vo);
@@ -61,6 +61,7 @@ public class MemberController {
         } catch (UsernameExsitExecption usernameExsitExecption) {
             return R.error(BizCodeEnum.USERNAME_EXSIT_EXCEPTION.getCode(),  BizCodeEnum.USERNAME_EXSIT_EXCEPTION.getMsg());
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             return R.error(BizCodeEnum.UNKNOW_EXCEPTION.getCode(),  BizCodeEnum.UNKNOW_EXCEPTION.getMsg());
         }
         return R.ok();

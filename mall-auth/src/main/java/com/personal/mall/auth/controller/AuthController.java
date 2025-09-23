@@ -1,8 +1,11 @@
 package com.personal.mall.auth.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.personal.common.constant.AuthConstant;
 import com.personal.common.constant.MailConstant;
 import com.personal.common.exception.BizCodeEnum;
 import com.personal.common.utils.R;
+import com.personal.common.vo.MemberVO;
 import com.personal.mall.auth.feign.MemberServiceFeign;
 import com.personal.mall.auth.feign.ThirtyPartyFeignService;
 import com.personal.mall.auth.vo.LoginUserVO;
@@ -17,6 +20,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
@@ -75,19 +79,22 @@ public class AuthController {
             return "/register";
         }
         // 注册成功，跳转到登录页
-        return "redirect:http://mall.auth.com/login";
+        return "redirect:http://auth.mall.com/login";
     }
 
-    @PostMapping("/login")
-    public String login(@RequestBody LoginUserVO vo, RedirectAttributes redirectAttributes) {
+    @PostMapping("/auth/login")
+    public String login(LoginUserVO vo, RedirectAttributes redirectAttributes, HttpSession session) {
         // 通过openfeign调用远程地址进行登录验证
         R r = memberServiceFeign.login(vo);
         if (r.getCode() != 0) {
             redirectAttributes.addAttribute("errors",r.getMessage(r.getCode()));
-            return "redirect:http://mall.auth.com/login";
+            return "redirect:http://auth.mall.com/login";
         }
+        String entity = (String) r.get("entity");
+        MemberVO memberVO = JSON.parseObject(entity, MemberVO.class);
+        session.setAttribute(AuthConstant.AUTH_SESSION_REDIS,memberVO);
         // 跳转到首页
-        return "redirect:http://mall.system.com/index.html";
+        return "redirect:http://system.mall.com/index.html";
     }
 
     // 与前端交互，校验注册页面输入数据是否合法，BindingResult 可以获取哪些字段校验错误及错误信息，通过Model将校验错误的返回给前端

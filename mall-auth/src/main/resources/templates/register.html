@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 	<head>
 		<meta charset="utf-8" />
@@ -5005,7 +5005,7 @@ Cookie</span>是由网页服务器存放在您的访问设备上的文本文件�
 			<div class="desc">欢迎注册</div>
 			<div class="dfg">
 				<span>已有账号？</span>
-				<a href="http://mall.auth.com/login">请登录</a>
+				<a href="http://auth.mall.com/login">请登录</a>
 			</div>
 		</header>
 		<section>
@@ -5025,7 +5025,8 @@ Cookie</span>是由网页服务器存放在您的访问设备上的文本文件�
 					<label class="other_label">设 置 密 码
 						<input name="password" maxlength="20" type="password" placeholder="建议至少使用两种字符组合">
 					</label>
-					<div class="tips" th:text="${error!=null&&#maps.containsKey(error,'password')?error.password:''}">
+<!--					<div class="tips" th:text="${error!=null&&#maps.containsKey(error,'password')?error.password:''}">-->
+					<div class="tips" th:text="${error!=null?(#maps.containsKey(error,'password')?error.password:''):''}">
 
 					</div>
 				</div>
@@ -5048,7 +5049,7 @@ Cookie</span>是由网页服务器存放在您的访问设备上的文本文件�
 				</div>
 				<div class="register-box">
 					<label class="other_label">邮箱
-						<input name="email" class="email" id="emailNum" maxlength="30" type="text" placeholder="请输入邮箱">
+						<input name="email" class="email" id="emailNum" type="text" placeholder="请输入邮箱">
 					</label>
 					<div class="tips" th:text="${error!=null&&#maps.containsKey(error,'email')?error.email:''}">
 
@@ -5173,7 +5174,7 @@ Cookie</span>是由网页服务器存放在您的访问设备上的文本文件�
 					})
 					//input各种判断
 					//用户名：
-				$('input').eq(0).blur(function() {
+				/*$('input').eq(0).blur(function() {
 						if($(this).val().length == 0) {
 							$(this).parent().next("div").text("");
 							$(this).parent().next("div").css("color", '#ccc');
@@ -5229,7 +5230,7 @@ Cookie</span>是由网页服务器存放在您的访问设备上的文本文件�
 						} else {
 							$(this).parent().next("div").text("");
 						}
-					})
+					})*/
 					// 	验证码
 					//	 验证码刷新
 				function code() {

@@ -6,6 +6,8 @@ import com.personal.mall.member.entity.MemberEntity;
 import com.personal.mall.member.entity.vo.AuthResponseVO;
 import com.personal.mall.member.entity.vo.LoginVO;
 import com.personal.mall.member.entity.vo.RegisterVO;
+import com.personal.mall.member.exception.PhoneExsitExecption;
+import com.personal.mall.member.exception.UsernameExsitExecption;
 
 import java.util.Map;
 
@@ -20,7 +22,7 @@ public interface MemberService extends IService<MemberEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
 
-    void register(RegisterVO vo);
+    void register(RegisterVO vo) throws PhoneExsitExecption, UsernameExsitExecption;
 
     MemberEntity login(LoginVO vo);
 

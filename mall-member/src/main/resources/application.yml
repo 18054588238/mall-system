@@ -4,9 +4,12 @@ spring:
   datasource:
     username: root
     password: rootroot
-    url: jdbc:mysql://localhost:3306/mall-ums
+    url: jdbc:mysql://localhost:3306/mall-ums?useSSL=false
     driver-class-name: com.mysql.cj.jdbc.Driver
-#  cloud:
+    hikari:
+      connection-timeout: 60000
+      maximum-pool-size: 10
+  #  cloud:
 #    nacos:
 #      discovery:
 #        server-addr: 127.0.0.1:8848

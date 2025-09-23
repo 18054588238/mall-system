@@ -64,10 +64,12 @@
         </b>
         <ul>
             <li>
-                <a href="http://mall.auth.com/login" class="li_2">你好，请登录</a>
+                <a href="http://auth.mall.com/login" class="li_2">
+                    [[${session.loginUser != null ? session.loginUser.nickname:'你好，请登录'}]]
+                </a>
             </li>
             <li>
-                <a href="http://mall.auth.com/register">免费注册</a>
+                <a href="http://auth.mall.com/register">免费注册</a>
             </li>
             <span>|</span>
             <li>
@@ -399,7 +401,7 @@
 <!--搜索导航-->
 <div class="header_sous">
     <div class="logo">
-        <a href="http://mall.system.com"><img src="/static/search/image/logo1.jpg" alt=""></a>
+        <a href="http://system.mall.com"><img src="/static/search/image/logo1.jpg" alt=""></a>
     </div>
     <div class="header_form">
         <input id="keyword_input" type="text" placeholder="手机" th:value="${param.keyword}" />
@@ -1160,12 +1162,12 @@
                                 <a href="#">关注</a>
                             </div>
                             <p class="da">
-                                <a th:href="${'http://mall.item.com/'+product.skuId+'.html'}">
+                                <a th:href="${'http://item.mall.com/'+product.skuId+'.html'}">
                                     <img th:src="${product.getSkuImg()}" class="dim">
                                 </a>
                             </p>
                             <ul class="tab_im">
-                                <li><a th:href="${'http://mall.item.com/'+product.skuId+'.html'}" title="黑色">
+                                <li><a th:href="${'http://item.mall.com/'+product.skuId+'.html'}" title="黑色">
                                     <img th:src="${product.getSkuImg()}"></a></li>
                             </ul>
                             <p class="tab_R">

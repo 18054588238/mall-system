@@ -95,12 +95,12 @@
   					</b>
         <ul>
           <li th:if="${session.loginUser != null}">
-            <a href="http://mall.auth.com/login" >
+            <a href="http://auth.mall.com/login" >
               [[${session.loginUser !=null?session.loginUser.nickname:'你好，请登录:'}]]
             </a>
           </li>
           <li>
-            <a href="http://mall.auth.com/register" class="li_2">免费注册</a>
+            <a href="http://auth.mall.com/register" class="li_2">免费注册</a>
           </li>
           <span>|</span>
           <li>
@@ -248,8 +248,10 @@
               <div class="user_info_show">
                 <p class="">Hi, 欢迎来到!</p>
                 <p>
-                  <a href="http://mall.auth.com/login" class="">登录</a>
-                  <a href="http://mall.auth.com/register" class="">注册</a>
+                  <a href="http://auth.mall.com/login" class="">
+                    [[${session.loginUser != null ? session.loginUser.nickname:'你好，请登录'}]]
+                  </a>
+                  <a href="http://auth.mall.com/register" class="">注册</a>
                 </p>
               </div>
             </div>
@@ -592,11 +594,11 @@
 <script type="text/javascript">
   function search() {
       var keyword=$("#searchText").val()
-      window.location.href="http://mall.search.com/list.html?keyword="+keyword;
+      window.location.href="http://search.mall.com/list.html?keyword="+keyword;
   }
 // http://item.msb.com/9.html
   function goItem(skuId){
-    location.href="http://mall.item.com/"+skuId+".html"
+    location.href="http://item.mall.com/"+skuId+".html"
   }
 
   $.get("http://seckill.msb.com/seckill/currentSeckillSessionSkus",function(resp){
