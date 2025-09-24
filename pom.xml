@@ -25,6 +25,7 @@
 		<module>mall-thirty-party</module>
 		<module>mall-search</module>
 		<module>mall-auth</module>
+		<module>mall-cart</module>
     </modules>
 
 

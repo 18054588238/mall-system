@@ -64,3 +64,7 @@ spring:
           uri: lb://mall-auth # 负载均衡
           predicates:
             - Host=auth.mall.com
+        - id: mallsystem_host_route5
+          uri: lb://mall-cart # 负载均衡
+          predicates:
+            - Host=cart.mall.com

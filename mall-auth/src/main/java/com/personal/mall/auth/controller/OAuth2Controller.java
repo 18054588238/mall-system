@@ -40,8 +40,8 @@ public class OAuth2Controller {
     @RequestMapping("/oauth2/weibo/authorize")
     public String weiboAuth(@RequestParam("code") String code, HttpSession session) throws Exception {
         Map<String, String> map = new HashMap<>();
-        map.put("client_id","");
-        map.put("client_secret","");
+        map.put("client_id","3347564093");
+        map.put("client_secret","56ff673d468499b15618d778ae40be70");
         map.put("grant_type","authorization_code");
         map.put("code",code);
         map.put("redirect_uri","http://auth.mall.com/oauth2/weibo/authorize");

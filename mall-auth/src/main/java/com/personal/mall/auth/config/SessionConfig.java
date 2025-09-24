@@ -28,7 +28,7 @@ public class SessionConfig {
     @Bean
     public CookieSerializer cookieSerializer() {
         DefaultCookieSerializer cookieSerializer = new DefaultCookieSerializer();
-        cookieSerializer.setDomainName("mall.com");
+        cookieSerializer.setDomainName("mall.com"); // 一级域名
         cookieSerializer.setCookieName("mall_session");
         return cookieSerializer;
     }
