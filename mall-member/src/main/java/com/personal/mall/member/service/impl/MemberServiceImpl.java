@@ -98,7 +98,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
         * 1. 第一次社交登录，需要先注册
         * 2. 非首次社交登录，更新社交平台token信息
         * */
-        MemberEntity entity = this.getOne(new QueryWrapper<MemberEntity>().eq("uid", vo.getUid()));
+        MemberEntity entity = this.getOne(new QueryWrapper<MemberEntity>().eq("social_uid", vo.getUid()));
         if (entity != null) {
             // 更新
             entity.setAccessToken(vo.getAccessToken());
