@@ -1,5 +1,6 @@
 package com.personal.mall.cart.vo;
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -12,6 +13,7 @@ import java.util.List;
  * @Description 购物车中商品的信息
  */
 @Data
+@Builder
 public class CartItemVO {
     // 商品的编号 SkuId
     private Long skuId;

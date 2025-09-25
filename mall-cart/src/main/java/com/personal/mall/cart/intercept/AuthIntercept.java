@@ -26,7 +26,11 @@ public class AuthIntercept implements HandlerInterceptor {
         if (attribute != null) {
             MemberVO memberVO = (MemberVO) attribute;
             threadLocal.set(memberVO);
+            return true;
         }
-        return true;
+        // attribute == null,说明没有登录
+        session.setAttribute(AuthConstant.AUTH_SESSION_MSG,"请先登录");
+        response.sendRedirect("http://auth.mall.com/login");
+        return false;
     }
 }

@@ -1,5 +1,7 @@
 package com.personal.mall.cart.vo;
 
+import lombok.Data;
+
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -9,6 +11,7 @@ import java.util.List;
  * @Date 2025/9/24
  * @Description
  */
+@Data
 public class CartVO {
     // 购物车中的商品种类
     private Integer countType;

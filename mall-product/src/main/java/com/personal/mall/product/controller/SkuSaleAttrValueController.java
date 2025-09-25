@@ -1,8 +1,10 @@
 package com.personal.mall.product.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
+import com.personal.mall.product.entity.SkuInfoEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,6 +31,12 @@ import com.personal.common.utils.R;
 public class SkuSaleAttrValueController {
     @Autowired
     private SkuSaleAttrValueService skuSaleAttrValueService;
+
+    // 根据skuid获取销售属性信息
+    @RequestMapping("/attr/{skuId}")
+    public List<String> getAttrs(@PathVariable("skuId") Long skuId){
+        return skuSaleAttrValueService.getAttrs(skuId);
+    }
 
     /**
      * 列表
