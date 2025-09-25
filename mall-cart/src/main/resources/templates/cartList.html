@@ -23,7 +23,9 @@
 
 					</ul>
 					<ul class="header-right">
-						<li><a href="http://auth.mall.com/login" style="color: red;">你好，请登录</a></li>
+						<li><a href="http://auth.mall.com/login" style="color: grey;">
+							[[${session.loginUser!=null?session.loginUser.nickname:'你好，请登录'}]]</a>
+						</li>
 						<li><a href="http://auth.mall.com/register">免费注册</a></li>
 						<li class="spacer"></li>
 						<li><a href="">我的订单</a></li>

@@ -93,6 +93,7 @@ public class AuthController {
         String entity = (String) r.get("entity");
         MemberVO memberVO = JSON.parseObject(entity, MemberVO.class);
         session.setAttribute(AuthConstant.AUTH_SESSION_REDIS,memberVO);
+        System.out.println("----->"+session.getAttribute(AuthConstant.AUTH_SESSION_REDIS));
         // 跳转到首页
         return "redirect:http://system.mall.com/index.html";
     }

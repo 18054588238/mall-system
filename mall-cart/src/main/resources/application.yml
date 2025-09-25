@@ -12,6 +12,7 @@ spring:
     name: mall-cart
   thymeleaf:
     cache: false # 关闭缓存，不然热部署不起作用
+
   redis:
     host: 127.0.0.1
     port: 6379

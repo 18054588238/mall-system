@@ -3,6 +3,7 @@ package com.personal.mall.product.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.alibaba.fastjson.JSON;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -48,7 +49,7 @@ public class SkuInfoController {
     public R info(@PathVariable("skuId") Long skuId){
 		SkuInfoEntity skuInfo = skuInfoService.getById(skuId);
 
-        return R.ok().put("skuInfo", skuInfo);
+        return R.ok().put("skuInfo", skuInfo).put("skuInfoJson", JSON.toJSONString(skuInfo));
     }
 
     /**

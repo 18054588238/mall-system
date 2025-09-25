@@ -58,7 +58,8 @@ public class CartServiceImpl implements CartService {
         CompletableFuture<Void> future1 = CompletableFuture.runAsync(() -> {
             // 商品基本信息
             R info = cartFeignService.info(skuId);
-            skuInfo.set((SkuInfoVO) info.get("skuInfo"));
+            String skuInfoJson = (String) info.get("skuInfoJson");
+            skuInfo.set(JSON.parseObject(skuInfoJson,SkuInfoVO.class));
         }, threadPoolExecutor);
 
         AtomicReference<List<String>> attrs = new AtomicReference<>();
@@ -99,7 +100,7 @@ public class CartServiceImpl implements CartService {
             itemVOS.add(cartItemVO);
         }
         cart.setItems(itemVOS);
-        return null;
+        return cart;
     }
 
     private BoundHashOperations<String, Object, Object> getBoundHashOperations() {

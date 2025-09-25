@@ -1,6 +1,8 @@
 package com.personal.mall.cart.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.personal.common.constant.AuthConstant;
+import com.personal.mall.cart.intercept.AuthIntercept;
 import com.personal.mall.cart.service.CartService;
 import com.personal.mall.cart.vo.CartItemVO;
 import com.personal.mall.cart.vo.CartVO;
@@ -38,7 +40,7 @@ public class CartController {
     }
 
     // 获取购物车列表
-    @GetMapping("cartList")
+    @GetMapping("/cartList")
     public String getCartList(Model model) {
         CartVO vo = cartService.getCartList();
         model.addAttribute("cart",vo);

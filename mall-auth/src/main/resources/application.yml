@@ -1,8 +1,8 @@
 server:
   port: 8092
-#  servlet:
-#    session:
-#      timeout: 30 # Session timeout. If a duration suffix is not specified, seconds is used.
+  servlet:
+    session:
+      timeout: 30m # Session timeout. If a duration suffix is not specified, seconds is used.
 spring:
   cloud:
     nacos:

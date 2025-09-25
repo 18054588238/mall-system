@@ -3,6 +3,7 @@ package com.personal.mall.search;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 
 /**
  * @ClassName MallSearchApplication
@@ -10,6 +11,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
  * @Date 2025/8/27
  * @Description
  */
+@EnableRedisHttpSession
 @EnableDiscoveryClient
 @SpringBootApplication
 public class MallSearchApplication {
