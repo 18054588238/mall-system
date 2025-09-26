@@ -68,3 +68,7 @@ spring:
           uri: lb://mall-cart # 负载均衡
           predicates:
             - Host=cart.mall.com
+        - id: mallsystem_host_route6
+          uri: lb://mall-order # 负载均衡
+          predicates:
+            - Host=order.mall.com
