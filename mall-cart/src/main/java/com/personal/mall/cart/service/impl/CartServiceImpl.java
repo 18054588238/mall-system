@@ -16,11 +16,13 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 /**
  * @ClassName CartServiceIMpl
@@ -101,6 +103,18 @@ public class CartServiceImpl implements CartService {
         }
         cart.setItems(itemVOS);
         return cart;
+    }
+
+    @Override
+    public List<CartItemVO> checkCartList() {
+        BoundHashOperations<String, Object, Object> hashOperations = getBoundHashOperations();
+        // 购物车中的所有商品信息
+        List<Object> values = hashOperations.values();
+        if (values != null) {
+            return values.stream().map(i -> JSON.parseObject((String) i, CartItemVO.class))
+                    .filter(CartItemVO::isCheck).collect(Collectors.toList());
+        }
+        return null;
     }
 
     private BoundHashOperations<String, Object, Object> getBoundHashOperations() {

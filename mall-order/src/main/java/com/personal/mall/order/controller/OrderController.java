@@ -3,7 +3,7 @@ package com.personal.mall.order.controller;
 import java.util.Arrays;
 import java.util.Map;
 
-import com.personal.mall.order.feign.ProductService;
+import com.personal.mall.order.feign.ProductServiceFeign;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -31,7 +31,7 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
     @Autowired
-    private ProductService productService;
+    private ProductServiceFeign productService;
 
     @Value("${user.userName}")
     private String userName;

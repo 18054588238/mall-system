@@ -18,7 +18,7 @@
 					<ul class="header-left">
 						<li>
 
-							<a href="">首页</a>
+							<a href="http://system.mall.com">首页</a>
 						</li>
 
 					</ul>
@@ -104,7 +104,7 @@
 										<p class="dj" th:text="'￥'+${item.price}">4599.00</p>
 									</li>
 									<li>
-										<p>
+										<p style="width: 70px" >
 											<span>-</span>
 											<span th:text="${item.count}">5</span>
 											<span>+</span>
@@ -170,7 +170,7 @@
 						</ul>
 					</div>
 					<div>
-						<font style="color:#e64346;font-weight:bold;" class="sumNum"> </font>&nbsp;
+						<font style="color:#e64346;font-weight:bold;" class="sumNum" th:text="${cart.getCheckCountNum()}"> </font>&nbsp;
 
 						<ul>
 							<li><img src="/static/cart/img/buyNumleft.png" alt=""></li>
@@ -179,11 +179,16 @@
 					</div>
 					<div>
 						<ol>
-							<li>总价:<span style="color:#e64346;font-weight:bold;font-size:16px;" class="fnt">￥0.00</span> </li>
+							<li>总价:
+								<span style="color:#e64346;font-weight:bold;font-size:16px;" class="fnt" th:text="'¥'+${cart.getTotalAmount()}">
+									￥0.00
+								</span>
+							</li>
 
 						</ol>
 					</div>
 					<div><button onclick="toTrade()" type="button">去结算</button></div>
+<!--					<div><button type="button"><a href="http://order.mall.com/toTrade">去结算</a></button></div>-->
 				</div>
 			</div>
 		</div>
@@ -251,15 +256,15 @@
 	<script src="/static/cart/js/index.js" charset="utf-8"></script>
 	<script type="text/javascript">
 		function toTrade() {
-			window.location.href = "http://cart.gmall.com:8087/toTrade";
+			window.location.href = "http://order.mall.com/toTrade";
 		}
 
 		function toItem(skuId) {
-			window.location.href = "http://item.gmall.com:8084/" + skuId + ".html";
+			window.location.href = "http://item.mall.com" + skuId + ".html";
 		}
 
 		function login() {
-			var s = encodeURIComponent("http://cart.gmall.com:8087/cartList");
+			var s = encodeURIComponent("http://cart.mall.com/cartList");
 			window.location.href = "http://passport.atguigu.com/index?originUrl=" + s;
 		}
 

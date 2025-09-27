@@ -104,7 +104,7 @@
           </li>
           <span>|</span>
           <li>
-            <a href="http://order.msb.com/list.html">我的订单</a>
+            <a href="http://order.mall.com/list.html">我的订单</a>
           </li>
 
 
@@ -122,7 +122,7 @@
       <div class="header_ico">
         <div class="header_gw">
           <img src="/static/index/img/img_15.png" />
-          <span><a href="http://cart.msb.com/cart_list">我的购物车</a></span>
+          <span><a href="http://cart.mall.com/cartList">我的购物车</a></span>
           <span>0</span>
         </div>
         <div class="header_ko">
@@ -597,12 +597,12 @@
       var keyword=$("#searchText").val()
       window.location.href="http://search.mall.com/list.html?keyword="+keyword;
   }
-// http://item.msb.com/9.html
+// http://item.mall.com/9.html
   function goItem(skuId){
     location.href="http://item.mall.com/"+skuId+".html"
   }
 
-  $.get("http://seckill.msb.com/seckill/currentSeckillSessionSkus",function(resp){
+  $.get("http://seckill.mall.com/seckill/currentSeckillSessionSkus",function(resp){
      if(resp.data.length > 0){
         // 说明有秒杀的数据
         console.log($.parseJSON(resp.data))

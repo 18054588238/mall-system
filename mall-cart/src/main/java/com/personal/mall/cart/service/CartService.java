@@ -3,6 +3,7 @@ package com.personal.mall.cart.service;
 import com.personal.mall.cart.vo.CartItemVO;
 import com.personal.mall.cart.vo.CartVO;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -15,4 +16,6 @@ public interface CartService {
     CartItemVO addCart(Long skuId, Integer num) throws ExecutionException, InterruptedException;
 
     CartVO getCartList();
+
+    List<CartItemVO> checkCartList();
 }
