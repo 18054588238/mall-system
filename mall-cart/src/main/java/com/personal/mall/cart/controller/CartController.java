@@ -29,7 +29,7 @@ public class CartController {
     private CartService cartService;
 
     // 获取当前用户下被选中的购物车列表
-    @RequestMapping(value = "/checkCartList",produces = "application/json")
+    @RequestMapping(value = "/checkCartList")
     @ResponseBody
     public List<CartItemVO> checkCartList() {
         return cartService.checkCartList();

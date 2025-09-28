@@ -597,7 +597,7 @@
 			</div>
 
 			<!--地址-->
-			<div class="top-3" th:each="addr:${confirmVo.address}">
+			<div class="top-3" th:each="addr:${confirmVO.address}">
 				<p>[[${addr.name}]]</p><span>[[${addr.name}]]  [[${addr.city}]]  [[${addr.detailAddress}]] [[${addr.phone}]]</span>
 			</div>
 			<p class="p2">更多地址︾</p>
@@ -664,7 +664,7 @@
 				<h5>商家：mall学院自营</h5>
 				<div><button>换购</button><span>已购满20.00元，再加49.90元，可返回购物车领取赠品</span></div>
 				<!--图片-->
-				<div class="yun1" th:each="item:${confirmVo.items}">
+				<div class="yun1" th:each="item:${confirmVO.items}">
 					<img th:src="${item.image}" class="yun"/>
 					<div class="mi">
 						<p>[[${item.title}]] <span style="color: red;"> ￥ [[${item.price}]]</span> <span> x[[${item.count}]] </span> <span>[[${item.hasStack?'有货':'无货'}]]</span></p>
@@ -708,9 +708,9 @@
 		<div class="xia">
 			<div class="qian">
 				<p class="qian_y">
-					<span>[[${confirmVo.itemCount()}]]</span>
+					<span>[[${confirmVO.itemCount()}]]</span>
 					<span>件商品，总商品金额：</span>
-					<span class="rmb">[[${confirmVo.totalAmount()}]]</span>
+					<span class="rmb">[[${confirmVO.totalAmount()}]]</span>
 				</p>
 				<p class="qian_y">
 					<span>返现：</span>
@@ -732,12 +732,12 @@
 			</div>
 
 			<div class="yfze">
-				<p class="yfze_a"><span class="z">应付总额：</span><span class="hq">￥[[${confirmVo.totalPayAmount}]]</span></p>
+				<p class="yfze_a"><span class="z">应付总额：</span><span class="hq">￥[[${confirmVO.totalAmount()}]]</span></p>
 				<p class="yfze_b">寄送至： 北京 朝阳区 三环到四环之间 朝阳北路复兴国际大厦23层麦田房产 IT-中心研发二部 收货人：赵存权 188****5052</p>
 			</div>
 			<form action="http://order.mall.com/orderSubmit" method="post" >
-				<input type="hidden" name="addrId" th:value="${confirmVo.address[0].getId()}">
-				<input type="hidden" name="orderToken" th:value="${confirmVo.orderToken}">
+				<input type="hidden" name="addrId" th:value="${confirmVO.address[0].getId()}">
+				<input type="hidden" name="orderToken" th:value="${confirmVO.orderToken}">
 				<button class="tijiao">提交订单</button>
 			</form>
 		</div>

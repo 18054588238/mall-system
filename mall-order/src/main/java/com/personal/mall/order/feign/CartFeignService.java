@@ -10,7 +10,7 @@ import java.util.List;
 
 @FeignClient(value = "mall-cart")
 public interface CartFeignService {
-    @RequestMapping(value = "/checkCartList",produces = "application/json")
+    @RequestMapping(value = "/checkCartList")
     @ResponseBody
     public List<OrderItemVO> checkCartList();
 }

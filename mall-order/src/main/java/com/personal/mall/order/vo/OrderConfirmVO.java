@@ -9,6 +9,8 @@ import java.util.List;
 public class OrderConfirmVO {
     List<MemberAddressVO> address;
     List<OrderItemVO> items;
+    // 防重token
+    String orderToken;
 
     // 商品总数
     public Integer itemCount() {
