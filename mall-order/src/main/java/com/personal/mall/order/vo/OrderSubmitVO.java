@@ -10,7 +10,14 @@ import lombok.Data;
  */
 @Data
 public class OrderSubmitVO {
-    private Long addressId;
 
+    private Long addressId;
+    // 防重token
     private String orderToken;
+
+    // 以下没有用到，后面可以自己补充
+    // 支付方式
+    private Integer payType;
+    // 买家备注
+    private String note;
 }

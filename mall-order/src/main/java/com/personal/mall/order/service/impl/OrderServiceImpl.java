@@ -5,14 +5,14 @@ import com.personal.common.vo.MemberVO;
 import com.personal.mall.order.feign.CartFeignService;
 import com.personal.mall.order.feign.MemberServiceFeign;
 import com.personal.mall.order.interceptor.AuthInterceptor;
-import com.personal.mall.order.vo.MemberAddressVO;
-import com.personal.mall.order.vo.OrderConfirmVO;
-import com.personal.mall.order.vo.OrderItemVO;
+import com.personal.mall.order.vo.*;
 import feign.RequestInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -94,6 +94,30 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         redisTemplate.opsForValue().set(OrderConstant.ORDER_TOKEN_PREFIX+":"+memberVOId,token);
         confirmVO.setOrderToken(token);// 响应给前端
         return confirmVO;
+    }
+
+    @Override
+    public OrderResponseVO orderSubmit(OrderSubmitVO vo) {
+        OrderResponseVO responseVO = new OrderResponseVO();
+        String orderToken = vo.getOrderToken();
+        // 获取当前用户信息
+        MemberVO memberVO = AuthInterceptor.threadLocal.get();
+        String key = OrderConstant.ORDER_TOKEN_PREFIX + ":" + memberVO.getId();
+        // 防重
+        String token = redisTemplate.opsForValue().get(key);
+        // 通过脚本实现原子操作
+        String script = "if redis.call('get',KEYS[1])==ARGV[1] then return redis.call('del',KEYS[1]) else return 0";
+        Long l = redisTemplate.execute(new DefaultRedisScript<Long>(script, Long.class), Arrays.asList(token), orderToken);
+
+        if (l == 0) {
+            // 表示重复提交
+            responseVO.setCode(1);
+            return responseVO;
+        }
+        // 生成订单
+
+
+        return responseVO;
     }
 
 }

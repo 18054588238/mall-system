@@ -25,7 +25,7 @@ public class MallFeignConfig {
         return new RequestInterceptor() {
             @Override
             public void apply(RequestTemplate template) {
-                System.out.println("RequestInterceptor"+Thread.currentThread().getName());
+                System.out.println("RequestInterceptor--->"+Thread.currentThread().getName());
                 ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
                 if (attributes != null) {
                     String cookie = attributes.getRequest().getHeader("Cookie");
