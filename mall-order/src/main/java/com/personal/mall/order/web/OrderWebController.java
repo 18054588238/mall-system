@@ -33,6 +33,7 @@ public class OrderWebController {
         Integer code = 0;
         try {
             orderResponseVO = orderService.orderSubmit(vo);
+            System.out.println(orderResponseVO);
             code = orderResponseVO.getCode();
         } catch (WareNoStockException e) {
             code = 2;
@@ -52,7 +53,7 @@ public class OrderWebController {
             }
             // 从一个 URL 重定向到另一个 URL
             // 重定向后，Flash 属性会自动添加到服务于目标 URL 的控制器的模型中。
-            redirectAttributes.addFlashAttribute("msg","");//携带参数重定向【请求】
+            redirectAttributes.addFlashAttribute("msg",msg);//携带参数重定向【请求】
             return "redirect:http://order.mall.com/toTrade";
         }
     }

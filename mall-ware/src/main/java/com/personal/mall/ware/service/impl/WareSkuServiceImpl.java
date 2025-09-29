@@ -119,25 +119,29 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
                 }
             }
 
+            System.out.println(stockCount+"--->"+lockCount);
             if (lockCount > stockCount) {
                 // 库存不足，抛异常
                 throw new WareNoStockException(vo.getSkuId());
             }
             // 库存足够，锁定库存
-            for (WareSkuEntity skuEntity : skuEntities) {
-                Integer tempCount = skuEntity.getStock() - skuEntity.getStockLocked(); // 剩余库存
-                if (lockCount <= tempCount) {
-                    // 锁定
-                    boolean update = this.update(new UpdateWrapper<WareSkuEntity>()
-                            .eq("id", skuEntity.getId())
-                            .set("stock_locked", skuEntity.getStockLocked()+lockCount));
-                    // 退出库存循环
-                    break; // break语句总是跳出最近的一层循环；
-                } else {
-                    boolean update = this.update(new UpdateWrapper<WareSkuEntity>()
-                            .eq("id", skuEntity.getId())
-                            .set("stock_locked", skuEntity.getStockLocked()+tempCount));
-                    lockCount-=tempCount;
+            if (skuEntities != null) {
+                for (WareSkuEntity skuEntity : skuEntities) {
+                    Integer tempCount = skuEntity.getStock() - skuEntity.getStockLocked(); // 剩余库存
+                    if (lockCount <= tempCount) {
+                        // 锁定
+                        boolean update = this.update(new UpdateWrapper<WareSkuEntity>()
+                                .eq("id", skuEntity.getId())
+                                .set("stock_locked", skuEntity.getStockLocked()+lockCount));
+                        lockCount -= lockCount;
+                        // 退出库存循环
+                        break; // break语句总是跳出最近的一层循环；
+                    } else {
+                        boolean update = this.update(new UpdateWrapper<WareSkuEntity>()
+                                .eq("id", skuEntity.getId())
+                                .set("stock_locked", skuEntity.getStockLocked()+tempCount));
+                        lockCount-=tempCount;
+                    }
                 }
             }
             if (lockCount > 0) {

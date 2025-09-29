@@ -119,12 +119,15 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         MemberVO memberVO = AuthInterceptor.threadLocal.get();
         String key = OrderConstant.ORDER_TOKEN_PREFIX + ":" + memberVO.getId();
         // 防重
-        String token = redisTemplate.opsForValue().get(key);
-        // 通过脚本实现原子操作
-        String script = "if redis.call('get',KEYS[1])==ARGV[1] then return redis.call('del',KEYS[1]) else return 0";
-        Long l = redisTemplate.execute(new DefaultRedisScript<Long>(script, Long.class), Arrays.asList(token), orderToken);
+//        String token = redisTemplate.opsForValue().get(key);
+        // 通过脚本实现原子操作(查询和删除的原子性)
+        String script = "if redis.call('get',KEYS[1])==ARGV[1] then return redis.call('del',KEYS[1]) else return 0 end";
+        // token相等，则删除redis数据
+        Long l = redisTemplate.execute(new DefaultRedisScript<Long>(script, Long.class),
+                Arrays.asList(key),
+                orderToken);
 
-        if (l == 0) {
+        if (l == 9) {
             // 表示重复提交
             responseVO.setCode(1);
             return responseVO;
@@ -134,6 +137,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
 
         // 保存订单
         this.save(orderCreateDTO.getOrderEntity());
+
+
         orderItemService.saveBatch(orderCreateDTO.getOrderItemEntities());
         responseVO.setOrderEntity(orderCreateDTO.getOrderEntity());
         // 锁定库存     需要的信息：每个订单项的 skuid，wareid（暂时不用），需要锁定的数量
@@ -162,7 +167,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         OrderCreateDTO orderCreateDTO = new OrderCreateDTO();
         // 创建订单
         OrderEntity orderEntity = getOrderCreateDTO(vo, memberVO);
-        // 创建订单项
+        Long id = orderEntity.getId();
+        // 创建订单项(包含订单id)
         List<OrderItemEntity> orderItems = getOrderItemEntity(orderEntity.getOrderSn());
 
         orderCreateDTO.setOrderEntity(orderEntity);
@@ -191,7 +197,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
                 OrderItemSpuInfoVO itemSpuInfoVO = itemSpuInfoVOMap.get(itemVO.getSpuId());
 
                 OrderItemEntity orderItemEntity = OrderItemEntity.builder()
-                        .orderId(Long.valueOf(orderSn))
+//                        .orderId()
                         .orderSn(orderSn)
                         .spuId(itemVO.getSpuId())
                         .spuName(itemSpuInfoVO.getSpuName())
