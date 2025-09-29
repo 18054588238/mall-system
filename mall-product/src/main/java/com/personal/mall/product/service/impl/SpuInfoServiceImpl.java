@@ -8,6 +8,7 @@ import com.personal.common.dto.SkuReductionDTO;
 import com.personal.common.utils.R;
 import com.personal.mall.product.constant.ProductConstant;
 import com.personal.mall.product.entity.*;
+import com.personal.mall.product.entity.vo.OrderItemSpuInfoVO;
 import com.personal.mall.product.entity.vo.SpuInfoVO;
 import com.personal.mall.product.entity.vo.spu.BaseAttrs;
 import com.personal.mall.product.entity.vo.spu.Bounds;
@@ -24,10 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -303,6 +301,36 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         } else {
             log.info("远程调用失败");
         }
+    }
+
+    @Override
+    public List<OrderItemSpuInfoVO> getOrderItemSpuInfoBySpuId(Set<Long> spuIds) {
+        List<OrderItemSpuInfoVO> vos = new ArrayList<>();
+
+        for (Long spuId : spuIds) {
+            SpuInfoEntity spuInfo = this.getById(spuId);
+
+            // 获取商品图片
+            SpuInfoDescEntity descEntity = spuInfoDescService.getById(spuId);
+            // 获取品牌名称
+            BrandEntity brandEntity = brandService.getById(spuInfo.getBrandId());
+            // 获取类别名称
+            CategoryEntity categoryEntity = categoryService.getById(spuInfo.getCatalogId());
+
+            OrderItemSpuInfoVO spuInfoVO = OrderItemSpuInfoVO.builder()
+                    .spuId(spuId)
+                    .spuName(spuInfo.getSpuName())
+                    .spuDesc(spuInfo.getSpuDescription())
+                    .spuPic(descEntity.getDecript())
+                    .spuBrandId(spuInfo.getBrandId())
+                    .spuBrandName(brandEntity.getName())
+                    .categoryId(spuInfo.getCatalogId())
+                    .categoryName(categoryEntity.getName())
+                    .build();
+            vos.add(spuInfoVO);
+        }
+
+        return vos;
     }
 
     private List<SkuESModel.Attrs> getModelAttrs(Long spuId) {

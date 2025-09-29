@@ -96,10 +96,12 @@ public class CartServiceImpl implements CartService {
         CartVO cart = new CartVO();
         List<CartItemVO> itemVOS = new ArrayList<>();
         List<Object> values = hashOperations.values();
-        for (Object value : values) {
-            String json = (String) value;
-            CartItemVO cartItemVO = JSON.parseObject(json, CartItemVO.class);
-            itemVOS.add(cartItemVO);
+        if (values != null) {
+            for (Object value : values) {
+                String json = (String) value;
+                CartItemVO cartItemVO = JSON.parseObject(json, CartItemVO.class);
+                itemVOS.add(cartItemVO);
+            }
         }
         cart.setItems(itemVOS);
         return cart;

@@ -1,6 +1,7 @@
 package com.personal.mall.order.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.personal.common.exception.WareNoStockException;
 import com.personal.common.utils.PageUtils;
 import com.personal.mall.order.entity.OrderEntity;
 import com.personal.mall.order.vo.OrderConfirmVO;
@@ -22,6 +23,6 @@ public interface OrderService extends IService<OrderEntity> {
 
     OrderConfirmVO confirmOrder();
 
-    OrderResponseVO orderSubmit(OrderSubmitVO vo);
+    OrderResponseVO orderSubmit(OrderSubmitVO vo) throws WareNoStockException;
 }
 

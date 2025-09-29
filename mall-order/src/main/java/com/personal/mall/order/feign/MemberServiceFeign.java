@@ -14,4 +14,7 @@ public interface MemberServiceFeign {
     @RequestMapping("/member/memberreceiveaddress/{memberId}/address")
     @ResponseBody
     public List<MemberAddressVO> getAddressInfo(@PathVariable("memberId") Long memberId);
+
+    @RequestMapping("/member/memberreceiveaddress/address/{id}")
+    public MemberAddressVO getByAddressId(@PathVariable("id") Long id);
 }

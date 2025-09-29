@@ -1,24 +1,29 @@
 package com.personal.mall.order.service.impl;
 
+import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.personal.common.constant.OrderConstant;
+import com.personal.common.exception.WareNoStockException;
+import com.personal.common.utils.R;
 import com.personal.common.vo.MemberVO;
+import com.personal.mall.order.dto.OrderCreateDTO;
+import com.personal.mall.order.entity.OrderItemEntity;
 import com.personal.mall.order.feign.CartFeignService;
 import com.personal.mall.order.feign.MemberServiceFeign;
+import com.personal.mall.order.feign.ProductServiceFeign;
+import com.personal.mall.order.feign.WareFeignService;
 import com.personal.mall.order.interceptor.AuthInterceptor;
+import com.personal.mall.order.service.OrderItemService;
 import com.personal.mall.order.vo.*;
-import feign.RequestInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -29,6 +34,8 @@ import com.personal.common.utils.Query;
 import com.personal.mall.order.dao.OrderDao;
 import com.personal.mall.order.entity.OrderEntity;
 import com.personal.mall.order.service.OrderService;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 
@@ -44,6 +51,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
     ThreadPoolExecutor executor;
     @Autowired
     StringRedisTemplate redisTemplate;
+    @Autowired
+    private ProductServiceFeign productServiceFeign;
+    @Autowired
+    private OrderItemService orderItemService;
+    @Autowired
+    private WareFeignService wareFeignService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -96,8 +109,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         return confirmVO;
     }
 
+    // 添加事务，库存锁定失败时，创建的订单也要撤回(库存服务，暂时用抛异常的方式保证事务)
+    @Transactional
     @Override
-    public OrderResponseVO orderSubmit(OrderSubmitVO vo) {
+    public OrderResponseVO orderSubmit(OrderSubmitVO vo) throws WareNoStockException {
         OrderResponseVO responseVO = new OrderResponseVO();
         String orderToken = vo.getOrderToken();
         // 获取当前用户信息
@@ -115,9 +130,110 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
             return responseVO;
         }
         // 生成订单
+        OrderCreateDTO orderCreateDTO = createOrder(vo,memberVO);
 
-
+        // 保存订单
+        this.save(orderCreateDTO.getOrderEntity());
+        orderItemService.saveBatch(orderCreateDTO.getOrderItemEntities());
+        responseVO.setOrderEntity(orderCreateDTO.getOrderEntity());
+        // 锁定库存     需要的信息：每个订单项的 skuid，wareid（暂时不用），需要锁定的数量
+        R r = lockWare(orderCreateDTO);
+        if (r.getCode() != 0) {
+            responseVO.setCode(2);// 表示锁定库存失败
+            // 抛异常
+            throw new WareNoStockException(100l);
+        }
+        responseVO.setCode(0);// 创建订单成功
         return responseVO;
     }
 
+    private R lockWare(OrderCreateDTO orderCreateDTO) {
+        List<OrderWareLockVO> wareLockVOS = orderCreateDTO.getOrderItemEntities().stream()
+                .map(i -> OrderWareLockVO.builder()
+                        .skuId(i.getSkuId())
+                        .lockCount(i.getSkuQuantity())
+                        .build())
+                .collect(Collectors.toList());
+        return wareFeignService.lockWareStock(wareLockVOS);
+    }
+
+    private OrderCreateDTO createOrder(OrderSubmitVO vo,MemberVO memberVO) {
+
+        OrderCreateDTO orderCreateDTO = new OrderCreateDTO();
+        // 创建订单
+        OrderEntity orderEntity = getOrderCreateDTO(vo, memberVO);
+        // 创建订单项
+        List<OrderItemEntity> orderItems = getOrderItemEntity(orderEntity.getOrderSn());
+
+        orderCreateDTO.setOrderEntity(orderEntity);
+        orderCreateDTO.setOrderItemEntities(orderItems);
+
+        return orderCreateDTO;
+    }
+
+    private List<OrderItemEntity> getOrderItemEntity(String orderSn) {
+        List<OrderItemEntity> orderItems = new ArrayList<>();
+
+        // 获取购物车中用户选中的商品信息
+        List<OrderItemVO> orderItemVOS = cartFeignService.checkCartList();
+
+        if (orderItemVOS != null&&!orderItemVOS.isEmpty()) {
+
+            Set<Long> spuIdSet = orderItemVOS.stream()
+                    .map(OrderItemVO::getSpuId)
+                    .collect(Collectors.toSet());
+            // 根据spuId查询spu相关信息
+            Map<Long, OrderItemSpuInfoVO> itemSpuInfoVOMap = productServiceFeign.getOrderItemSpuInfoBySpuId(spuIdSet).stream()
+                    .collect(Collectors.toMap(OrderItemSpuInfoVO::getSpuId, i -> i));
+
+            for (OrderItemVO itemVO : orderItemVOS) {
+
+                OrderItemSpuInfoVO itemSpuInfoVO = itemSpuInfoVOMap.get(itemVO.getSpuId());
+
+                OrderItemEntity orderItemEntity = OrderItemEntity.builder()
+                        .orderId(Long.valueOf(orderSn))
+                        .orderSn(orderSn)
+                        .spuId(itemVO.getSpuId())
+                        .spuName(itemSpuInfoVO.getSpuName())
+                        .spuPic(itemSpuInfoVO.getSpuPic())
+                        .spuBrand(itemSpuInfoVO.getSpuBrandName())
+                        .categoryId(itemSpuInfoVO.getCategoryId())
+                        .skuId(itemVO.getSkuId())
+                        .skuName(itemVO.getTitle())
+                        .skuPic(itemVO.getImage())
+                        .skuPrice(itemVO.getPrice())
+                        .skuQuantity(itemVO.getCount())
+                        .skuAttrsVals(StringUtils.collectionToDelimitedString(itemVO.getSkuAttr(), ";"))
+                        .giftGrowth(itemVO.getPrice().intValue())
+                        .giftIntegration(itemVO.getPrice().intValue())
+                        .build();
+                orderItems.add(orderItemEntity);
+            }
+        }
+
+        return orderItems;
+    }
+
+    private OrderEntity getOrderCreateDTO(OrderSubmitVO vo, MemberVO memberVO) {
+
+        // 根据地址id获取地址信息
+        MemberAddressVO addressVO = memberServiceFeign.getByAddressId(vo.getAddressId());
+
+        // 创建订单编号
+        String orderSn = IdWorker.getTimeId();
+
+        return OrderEntity.builder()
+                .memberId(memberVO.getId())
+                .orderSn(orderSn)
+                .memberUsername(memberVO.getUsername())
+                .status(OrderConstant.OrderStateEnum.FOR_THE_PAYMENT.getCode())
+                .receiverName(addressVO.getName())
+                .receiverPhone(addressVO.getPhone())
+                .receiverPostCode(addressVO.getPostCode())
+                .receiverProvince(addressVO.getProvince())
+                .receiverCity(addressVO.getCity())
+                .receiverRegion(addressVO.getRegion())
+                .receiverDetailAddress(addressVO.getDetailAddress())
+                .build();
+    }
 }

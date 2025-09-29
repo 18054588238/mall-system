@@ -1,8 +1,10 @@
 package com.personal.mall.ware.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.personal.common.exception.WareNoStockException;
 import com.personal.common.utils.R;
 import com.personal.mall.ware.entity.PurchaseDetailEntity;
+import com.personal.mall.ware.entity.vo.OrderWareLockVO;
 import com.personal.mall.ware.feign.ProductFeignService;
 import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +25,7 @@ import com.personal.common.utils.Query;
 import com.personal.mall.ware.dao.WareSkuDao;
 import com.personal.mall.ware.entity.WareSkuEntity;
 import com.personal.mall.ware.service.WareSkuService;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Slf4j
@@ -98,6 +101,50 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
         });
 
         return list;
+    }
+
+    @Transactional
+    @Override
+    public void lockWareStock(List<OrderWareLockVO> vos) {
+
+        for (OrderWareLockVO vo : vos) {
+            Integer lockCount = vo.getLockCount();
+            // 遍历每一个skuid，根据skuid找到其对应的所有ware，计算剩余库存
+            List<WareSkuEntity> skuEntities = this.list(new QueryWrapper<WareSkuEntity>().eq("sku_id", vo.getSkuId()));
+            // skuid所在仓库，总的剩余库存
+            Integer stockCount = 0;
+            if (skuEntities!=null && !skuEntities.isEmpty()) {
+                for (WareSkuEntity skuEntity : skuEntities) {
+                    stockCount += (skuEntity.getStock() - skuEntity.getStockLocked());
+                }
+            }
+
+            if (lockCount > stockCount) {
+                // 库存不足，抛异常
+                throw new WareNoStockException(vo.getSkuId());
+            }
+            // 库存足够，锁定库存
+            for (WareSkuEntity skuEntity : skuEntities) {
+                Integer tempCount = skuEntity.getStock() - skuEntity.getStockLocked(); // 剩余库存
+                if (lockCount <= tempCount) {
+                    // 锁定
+                    boolean update = this.update(new UpdateWrapper<WareSkuEntity>()
+                            .eq("id", skuEntity.getId())
+                            .set("stock_locked", skuEntity.getStockLocked()+lockCount));
+                    // 退出库存循环
+                    break; // break语句总是跳出最近的一层循环；
+                } else {
+                    boolean update = this.update(new UpdateWrapper<WareSkuEntity>()
+                            .eq("id", skuEntity.getId())
+                            .set("stock_locked", skuEntity.getStockLocked()+tempCount));
+                    lockCount-=tempCount;
+                }
+            }
+            if (lockCount > 0) {
+                // 未锁定完成
+                throw new WareNoStockException(vo.getSkuId());
+            }
+        }
     }
 
 }

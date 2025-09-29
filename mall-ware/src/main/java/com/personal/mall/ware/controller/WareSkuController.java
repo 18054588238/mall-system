@@ -4,6 +4,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import com.personal.common.exception.BizCodeEnum;
+import com.personal.common.exception.WareNoStockException;
+import com.personal.mall.ware.entity.vo.OrderWareLockVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +29,17 @@ import com.personal.common.utils.R;
 public class WareSkuController {
     @Autowired
     private WareSkuService wareSkuService;
+
+    // 根据订单锁定库存
+    @RequestMapping("/lockWareStock")
+    public R lockWareStock(@RequestBody List<OrderWareLockVO> vos) {
+        try {
+            wareSkuService.lockWareStock(vos);
+        } catch (WareNoStockException e) {
+            return R.error(BizCodeEnum.NO_STOCK_EXCEPTION.getCode(), BizCodeEnum.NO_STOCK_EXCEPTION.getMsg());
+        }
+        return R.ok();
+    }
 
     /**
      * 返回有库存的sku_id列表

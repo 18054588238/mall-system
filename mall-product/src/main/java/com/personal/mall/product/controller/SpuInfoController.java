@@ -2,8 +2,11 @@ package com.personal.mall.product.controller;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import com.personal.mall.product.entity.vo.OrderItemSpuInfoVO;
 import com.personal.mall.product.entity.vo.SpuInfoVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +30,11 @@ import com.personal.common.utils.R;
 public class SpuInfoController {
     @Autowired
     private SpuInfoService spuInfoService;
+
+    @RequestMapping("/getOrderItem/{spuIds}")
+    public List<OrderItemSpuInfoVO> getOrderItemSpuInfoBySpuId(@PathVariable("spuIds") Set<Long> spuIds){
+        return spuInfoService.getOrderItemSpuInfoBySpuId(spuIds);
+    }
 
     /**
      * 商品上架

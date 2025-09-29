@@ -3,10 +3,13 @@ package com.personal.mall.product.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.personal.common.utils.PageUtils;
 import com.personal.mall.product.entity.SpuInfoEntity;
+import com.personal.mall.product.entity.vo.OrderItemSpuInfoVO;
 import com.personal.mall.product.entity.vo.SpuInfoVO;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * spu信息
@@ -24,5 +27,7 @@ public interface SpuInfoService extends IService<SpuInfoEntity> {
     PageUtils queryPageByCondition(Map<String, Object> params);
 
     void up(Long spuId) throws IOException;
+
+    List<OrderItemSpuInfoVO> getOrderItemSpuInfoBySpuId(Set<Long> spuIds);
 }
 
