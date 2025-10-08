@@ -1,6 +1,6 @@
 spring:
-#  application:
-#    name: mall-coupon
+  application:
+    name: mall-coupon
   datasource:
     username: root
     password: rootroot

@@ -16,3 +16,9 @@ spring:
     store-type: redis
     redis:
       namespace: spring:session
+# 定时任务异步执行 线程配置
+  task:
+    execution:
+      pool:
+        core-size: 5
+        max-size: 20

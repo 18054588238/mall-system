@@ -1,8 +1,10 @@
 package com.personal.mall.coupon.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
+import com.alibaba.fastjson.JSON;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,6 +31,13 @@ import com.personal.common.utils.R;
 public class SeckillSessionController {
     @Autowired
     private SeckillSessionService seckillSessionService;
+
+    // 获取近几天的商品秒杀信息
+    @RequestMapping("/getSeckillSkuLatestDays")
+    public R getSeckillSkuLatestDays(@RequestBody String[] latestDays) {
+        List<SeckillSessionEntity> data = seckillSessionService.getSeckillSkuLatestDays(latestDays);
+        return R.ok().put("data", JSON.toJSONString(data));
+    }
 
     /**
      * 列表
