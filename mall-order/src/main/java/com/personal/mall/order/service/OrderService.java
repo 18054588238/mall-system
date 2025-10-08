@@ -7,6 +7,7 @@ import com.personal.mall.order.entity.OrderEntity;
 import com.personal.mall.order.vo.OrderConfirmVO;
 import com.personal.mall.order.vo.OrderResponseVO;
 import com.personal.mall.order.vo.OrderSubmitVO;
+import com.personal.mall.order.vo.PayVO;
 
 import java.util.Map;
 
@@ -24,5 +25,11 @@ public interface OrderService extends IService<OrderEntity> {
     OrderConfirmVO confirmOrder();
 
     OrderResponseVO orderSubmit(OrderSubmitVO vo) throws WareNoStockException;
+
+    PayVO getOrderPay(String orderSn);
+
+    void orderPayedHandle(String outTradeNo);
+
+    void updateOrderStatus(String orderSn, int code);
 }
 

@@ -13,12 +13,16 @@ import com.personal.mall.order.feign.ProductServiceFeign;
 import com.personal.mall.order.feign.WareFeignService;
 import com.personal.mall.order.interceptor.AuthInterceptor;
 import com.personal.mall.order.service.OrderItemService;
+import com.personal.mall.order.utils.OrderMsgProducer;
 import com.personal.mall.order.vo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -57,6 +61,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
     private OrderItemService orderItemService;
     @Autowired
     private WareFeignService wareFeignService;
+    @Autowired
+    private OrderMsgProducer orderMsgProducer;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -149,7 +155,39 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
             throw new WareNoStockException(100l);
         }
         responseVO.setCode(0);// 创建订单成功
+        // 订单创建成功后，给消息中间件rocketmq发送延迟消息（30min的关单消息）
+        System.out.println("发送消息的时间"+ LocalDateTime.now());
+        orderMsgProducer.sendOrderMessage(orderCreateDTO.getOrderEntity().getOrderSn());
         return responseVO;
+    }
+
+    @Override
+    public PayVO getOrderPay(String orderSn) {
+        OrderEntity order = this.getOne(new QueryWrapper<OrderEntity>().eq("order_sn", orderSn));
+        PayVO payVO = new PayVO();
+        payVO.setOut_trade_no(orderSn);
+        // 保留两位小数
+        payVO.setTotal_amount(order.getTotalAmount().setScale(2, RoundingMode.HALF_UP).toString());
+        payVO.setSubject(order.getMemberUsername());
+        payVO.setBody(order.getNote());
+        return payVO;
+    }
+
+    @Override
+    public void orderPayedHandle(String orderSn) {
+        // 1.更新订单状态
+        this.updateOrderStatus(orderSn,OrderConstant.OrderStateEnum.TO_SEND_GOODS.getCode());
+        // TODO
+        // 2.更新库存信息 库存数量递减
+
+        // 3.购物车中的已经支付的商品移除
+
+        // 4.更新会员积分 ....
+    }
+
+    @Override
+    public void updateOrderStatus(String orderSn, int status) {
+        this.getBaseMapper().updateOrderStatus(orderSn,status);
     }
 
     private R lockWare(OrderCreateDTO orderCreateDTO) {
@@ -170,6 +208,13 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         Long id = orderEntity.getId();
         // 创建订单项(包含订单id)
         List<OrderItemEntity> orderItems = getOrderItemEntity(orderEntity.getOrderSn());
+
+        // 获取订单总额
+        double totalAmount = orderItems.stream()
+                .map(i -> i.getSkuPrice().multiply(BigDecimal.valueOf(i.getSkuQuantity())))
+                .mapToDouble(BigDecimal::doubleValue).sum();
+
+        orderEntity.setTotalAmount(BigDecimal.valueOf(totalAmount));
 
         orderCreateDTO.setOrderEntity(orderEntity);
         orderCreateDTO.setOrderItemEntities(orderItems);

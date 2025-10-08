@@ -35,6 +35,12 @@ spring:
             - Path=/app/member/**
           filters:
             - RewritePath=/app/?(?<segment>.*), /$\{segment}
+        - id: mall-coupon  # 路由的唯一标识符，用于区分不同路由规则。
+          uri: lb://mall-coupon
+          predicates:
+            - Path=/app/coupon/**
+          filters:
+            - RewritePath=/app/?(?<segment>.*), /$\{segment}
         - id: mall-ware  # 路由的唯一标识符，用于区分不同路由规则。
           uri: lb://mall-ware
           predicates:

@@ -33,3 +33,9 @@ server:
 user:
   userName: yyqx
   age: 24
+rocketmq:
+  name-server: 192.168.100.96:9876
+  producer:
+    group: order-producer
+  consumer:
+    group: order-consumer
