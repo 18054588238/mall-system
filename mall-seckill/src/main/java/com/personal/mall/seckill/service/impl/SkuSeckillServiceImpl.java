@@ -17,8 +17,8 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.ITemplateEngine;
 
-import java.util.List;
-import java.util.UUID;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,6 +44,35 @@ public class SkuSeckillServiceImpl implements SkuSeckillService {
             // 上架商品 -- 保存相关信息到redis中
             saveSeckillInfosToRedis(seckillSkuSessionVOS);
         }
+    }
+
+    @Override
+    public List<SeckillSkuRedisDTO> getCurSeckillSkus() {
+        // 获取当前时间
+        long curTime = new Date().getTime();
+        BoundHashOperations<String, String, String> operations = redisTemplate.boundHashOps(SeckillConstant.SKU_CACHE_PREFIX);
+        Set<String> keys = redisTemplate.keys(SeckillConstant.SESSION_CACHE_PREFIX + "*");
+
+        if (keys != null) {
+            for (String k : keys) {
+                String[] dateRange = k.replace(SeckillConstant.SESSION_CACHE_PREFIX, "").split("_");
+                long start = Long.parseLong(dateRange[0]);
+                long end = Long.parseLong(dateRange[1]);
+                if (curTime >= start && curTime <=end) {
+                    // 获取其商品信息
+                    List<String> values = redisTemplate.opsForList().range(k, 0, -1);
+                    if (values != null) {
+                        List<String> json = operations.multiGet(values);
+                        if (json != null && !json.isEmpty()) {
+                            return json.stream()
+                                    .map(item -> JSON.parseObject(item, SeckillSkuRedisDTO.class))
+                                    .collect(Collectors.toList());
+                        }
+                    }
+                }
+            }
+        }
+        return Collections.emptyList();
     }
 
     private void saveSeckillInfosToRedis(List<SeckillSkuSessionVO> seckillSkuSessionVOS) {

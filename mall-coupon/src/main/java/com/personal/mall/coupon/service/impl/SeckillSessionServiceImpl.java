@@ -42,14 +42,12 @@ public class SeckillSessionServiceImpl extends ServiceImpl<SeckillSessionDao, Se
         List<SeckillSessionEntity> seckillSessionEntities = this.list(new QueryWrapper<SeckillSessionEntity>()
                 .between("start_time", latestDays[0], latestDays[1]));
 
-        List<SeckillSessionEntity> data = seckillSessionEntities.stream().map(seckillSessionEntity -> {
+        return seckillSessionEntities.stream().map(seckillSessionEntity -> {
             List<SeckillSkuRelationEntity> relationEntities = seckillSkuRelationService.list(new QueryWrapper<SeckillSkuRelationEntity>()
                     .eq("promotion_session_id", seckillSessionEntity.getId()));
             seckillSessionEntity.setSeckillSkuRelationList(relationEntities);
             return seckillSessionEntity;
         }).collect(Collectors.toList());
-
-        return data;
     }
 
 }
