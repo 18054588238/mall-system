@@ -78,3 +78,7 @@ spring:
           uri: lb://mall-order # 负载均衡
           predicates:
             - Host=order.mall.com
+        - id: mallsystem_host_route7
+          uri: lb://mall-seckill # 负载均衡
+          predicates:
+            - Host=seckill.mall.com
