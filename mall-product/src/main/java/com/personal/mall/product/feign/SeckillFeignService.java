@@ -13,6 +13,6 @@ import org.springframework.web.bind.annotation.RequestParam;
  */
 @FeignClient("mall-seckill")
 public interface SeckillFeignService {
-    @GetMapping("/getSeckillSkuBySkuId")
+    @GetMapping("/seckill/getSeckillSkuBySkuId")
     public R getSeckillSkuBySkuId(@RequestParam("skuId") Long skuId);
 }

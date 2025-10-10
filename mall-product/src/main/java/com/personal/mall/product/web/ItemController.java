@@ -20,7 +20,6 @@ public class ItemController {
     @GetMapping("/{skuId}.html")
     public String item(@PathVariable("skuId") Long skuId, Model model) throws ExecutionException, InterruptedException {
         ItemVO item = skuInfoService.item(skuId);
-        BigDecimal price = item.getSkuInfo().getPrice();
         model.addAttribute("item", item);
         return "item";
     }
