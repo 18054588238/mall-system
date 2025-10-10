@@ -5,10 +5,7 @@ import com.personal.common.utils.R;
 import com.personal.mall.seckill.dto.SeckillSkuRedisDTO;
 import com.personal.mall.seckill.service.SkuSeckillService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -29,6 +26,13 @@ public class SeckillController {
     @GetMapping("/getCurSeckillSkus")
     public R getCurSeckillSkus() {
         List<SeckillSkuRedisDTO> data = skuSeckillService.getCurSeckillSkus();
+        return R.ok().put("data", JSON.toJSONString(data));
+    }
+
+    // 根据skuid查询秒杀商品
+    @GetMapping("/getSeckillSkuBySkuId")
+    public R getSeckillSkuBySkuId(@RequestParam("skuId") Long skuId) {
+        SeckillSkuRedisDTO data = skuSeckillService.getSeckillSkuBySkuId(skuId);
         return R.ok().put("data", JSON.toJSONString(data));
     }
 }

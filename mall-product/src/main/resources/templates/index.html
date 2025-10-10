@@ -602,25 +602,19 @@
     location.href="http://item.mall.com/"+skuId+".html"
   }
 
-  $.get("http://seckill.mall.com/seckill/currentSeckillSessionSkus",function(resp){
-     if(resp.data.length > 0){
-        // 说明有秒杀的数据
-        console.log($.parseJSON(resp.data))
-       $.parseJSON(resp.data).forEach(function(item){
-         $("<li onclick='goItem("+item.skuId+")'></li>")
-                 .append("<img width='130px' height='130px' src='"+item.skuInfoVo.skuDefaultImg+"'/>")
-                 .append("<p>"+item.skuInfoVo.skuSubtitle+"</p>")
-                 .append("<span>"+item.seckillPrice+"</span>")
-                 .append("<s>"+item.skuInfoVo.price+"</s>")
-                 .appendTo("#seckillSessionContent");
-       })
-       /*<li>
-       <img src="/index/img/section_second_list_img1.jpg" alt="">
-               <p>花王 (Merries) 妙而舒 纸尿裤 大号 L54片 尿不湿（9-14千克） （日本官方直采） 花王 (Merries) 妙而舒 纸尿裤 大号 L54片 尿不湿（9-14千</p>
-       <span>¥83.9</span><s>¥99.9</s>
-     </li>*/
-
-     }
+  $.get("http:/seckill.mall.com/seckill/getCurSeckillSkus",function (resp){
+    if (resp.data.length > 0) {
+      // 说明有秒杀的数据
+      console.log($.parseJSON(resp.data))
+      $.parseJSON(resp.data).foreach(function (item){
+        $("<li onclick='goItem("+item.seckillSkuRelationVO.skuId+")'></li>")
+                .append("<img width='130px' height='130px' src='"+item.skuInfo.skuDefaultImg+"'/>")
+                .append("<p>"+item.skuInfo.skuSubtitle+"</p>")
+                .append("<span>"+item.seckillSkuRelationVO.seckillPrice+"</span>")
+                .append("<s>"+item.skuInfo.price+"</s>")
+                .appendTo("#seckillSessionContent");
+      })
+    }
   })
 
 </script>

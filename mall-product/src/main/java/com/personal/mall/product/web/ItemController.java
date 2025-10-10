@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.math.BigDecimal;
 import java.util.concurrent.ExecutionException;
 
 @Controller
@@ -19,6 +20,7 @@ public class ItemController {
     @GetMapping("/{skuId}.html")
     public String item(@PathVariable("skuId") Long skuId, Model model) throws ExecutionException, InterruptedException {
         ItemVO item = skuInfoService.item(skuId);
+        BigDecimal price = item.getSkuInfo().getPrice();
         model.addAttribute("item", item);
         return "item";
     }

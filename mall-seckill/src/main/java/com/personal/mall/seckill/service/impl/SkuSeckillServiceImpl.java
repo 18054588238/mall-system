@@ -75,6 +75,24 @@ public class SkuSeckillServiceImpl implements SkuSeckillService {
         return Collections.emptyList();
     }
 
+    @Override
+    public SeckillSkuRedisDTO getSeckillSkuBySkuId(Long skuId) {
+        BoundHashOperations<String, String, String> operations = redisTemplate.boundHashOps(SeckillConstant.SKU_CACHE_PREFIX);
+        Set<String> keys = operations.keys();
+        // 键名是否为数字后接下划线
+        String regex = "\\d_"+skuId;
+        if (keys != null) {
+            for (String key : keys) {
+                if (key.matches(regex)) {
+                    // 获取商品信息
+                    String s = operations.get(key);
+                    return JSON.parseObject(s, SeckillSkuRedisDTO.class);
+                }
+            }
+        }
+        return null;
+    }
+
     private void saveSeckillInfosToRedis(List<SeckillSkuSessionVO> seckillSkuSessionVOS) {
         // 1.保存秒杀活动信息，key： start_endTime    value: sessionId_skuId
 

@@ -1,10 +1,14 @@
 package com.personal.mall.product.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.personal.common.utils.R;
 import com.personal.mall.product.config.ThreadPoolConfig;
 import com.personal.mall.product.entity.*;
 import com.personal.mall.product.entity.vo.ItemVO;
+import com.personal.mall.product.entity.vo.SeckillSkuVO;
 import com.personal.mall.product.entity.vo.SkuSaleAttrValueVO;
 import com.personal.mall.product.entity.vo.SpuItemGroupAttrVO;
+import com.personal.mall.product.feign.SeckillFeignService;
 import com.personal.mall.product.service.*;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +45,8 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
     private AttrGroupService attrGroupService;
     @Autowired
     private ThreadPoolExecutor executor;
+    @Autowired
+    private SeckillFeignService seckillFeignService;
 
 
     @Override
@@ -127,7 +133,16 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
             itemVO.setImages(imagesEntities);
         }, executor);
 
-        CompletableFuture.allOf(skuInfoFuture,saleFuture,descFuture,baseAttrFuture,imageFuture).get();// 阻塞
+        // 查询秒杀商品
+        CompletableFuture<Void> seckillFuture = CompletableFuture.runAsync(() -> {
+            R r = seckillFeignService.getSeckillSkuBySkuId(skuId);
+            if (r.getCode() == 0) {
+                SeckillSkuVO seckillSkuVO = JSON.parseObject(r.get("data").toString(), SeckillSkuVO.class);
+                itemVO.setSeckillSkuVO(seckillSkuVO);
+            }
+        }, executor);
+
+        CompletableFuture.allOf(skuInfoFuture,saleFuture,descFuture,baseAttrFuture,imageFuture,seckillFuture).get();// 阻塞
 
         return itemVO;
     }

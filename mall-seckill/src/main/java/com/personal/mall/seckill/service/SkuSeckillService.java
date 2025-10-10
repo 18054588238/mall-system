@@ -9,4 +9,6 @@ public interface SkuSeckillService {
     void seckillSkuLatestDays(String[] latestDays);
 
     List<SeckillSkuRedisDTO> getCurSeckillSkus();
+
+    SeckillSkuRedisDTO getSeckillSkuBySkuId(Long skuId);
 }

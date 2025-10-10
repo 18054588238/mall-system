@@ -23,4 +23,6 @@ public class ItemVO {
     private SpuInfoDescEntity desc;
     // spu规格参数
     private List<SpuItemGroupAttrVO> baseAttrs;
+    // 商品秒杀信息
+    private SeckillSkuVO seckillSkuVO;
 }
