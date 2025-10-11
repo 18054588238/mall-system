@@ -35,4 +35,11 @@ public class SeckillController {
         SeckillSkuRedisDTO data = skuSeckillService.getSeckillSkuBySkuId(skuId);
         return R.ok().put("data", JSON.toJSONString(data));
     }
+
+    // 进行商品秒杀
+    @GetMapping("/onSeckill")
+    public R onSeckill(@RequestParam("key") String key,@RequestParam("randomCode") String randomCode,@RequestParam("num") Integer num) {
+        String s = skuSeckillService.onSeckill();
+        return R.ok();
+    }
 }

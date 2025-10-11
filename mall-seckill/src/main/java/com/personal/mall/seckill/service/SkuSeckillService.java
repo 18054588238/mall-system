@@ -11,4 +11,6 @@ public interface SkuSeckillService {
     List<SeckillSkuRedisDTO> getCurSeckillSkus();
 
     SeckillSkuRedisDTO getSeckillSkuBySkuId(Long skuId);
+
+    String onSeckill();
 }

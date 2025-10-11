@@ -22,3 +22,6 @@ spring:
       pool:
         core-size: 5
         max-size: 20
+  redis:
+    host: 127.0.0.1
+    port: 6379

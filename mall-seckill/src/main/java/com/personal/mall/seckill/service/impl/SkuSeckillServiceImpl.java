@@ -93,6 +93,11 @@ public class SkuSeckillServiceImpl implements SkuSeckillService {
         return null;
     }
 
+    @Override
+    public String onSeckill() {
+        return "";
+    }
+
     private void saveSeckillInfosToRedis(List<SeckillSkuSessionVO> seckillSkuSessionVOS) {
         // 1.保存秒杀活动信息，key： start_endTime    value: sessionId_skuId
 
