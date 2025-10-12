@@ -16,7 +16,7 @@ import javax.servlet.http.HttpSession;
  */
 public class AuthInterceptor implements HandlerInterceptor {
 
-    private static ThreadLocal<MemberVO> threadLocal = new ThreadLocal<>() ;
+    private static final ThreadLocal<MemberVO> threadLocal = new ThreadLocal<>() ;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {

@@ -634,12 +634,12 @@
 
 						</div>
 					</div>
-					<div class="box-btns-two" th:if="${#dates.createNow().getTime() < item.seckillSkuVO.startTime.getTime() || #dates.createNow().getTime() > item.seckillSkuVO.endTime.getTime() }">
+					<div class="box-btns-two" th:if="${item.seckillSkuVO == null || (#dates.createNow().getTime() < item.seckillSkuVO.startTime.getTime() || #dates.createNow().getTime() > item.seckillSkuVO.endTime.getTime()) }">
 						<a href="#" id="addCart" th:attr="skuId=${item.skuInfo.skuId}">
 							加入购物车
 						</a>
 					</div>
-					<div class="box-btns-two" th:if="${#dates.createNow().getTime() > item.seckillSkuVO.startTime.getTime() && #dates.createNow().getTime() < item.seckillSkuVO.endTime.getTime()}">
+					<div class="box-btns-two" th:if="${item.seckillSkuVO != null && (#dates.createNow().getTime() > item.seckillSkuVO.startTime.getTime() && #dates.createNow().getTime() < item.seckillSkuVO.endTime.getTime())}">
 						<a href="#" id="seckillId" th:attr="skuId=${item.skuInfo.skuId},sessionId=${item.seckillSkuVO.seckillSkuRelationVO.promotionSessionId}, randomCode=${item.seckillSkuVO.randomCode}">
 							秒杀抢购
 						</a>
@@ -1225,17 +1225,19 @@
 		var skuId = $(this).attr("skuId");
 		location.href="http://cart.mall.com/addCart?skuId="+skuId+"&num="+num;
 	})
-	$("seckillId").click(function (){
+	$("#seckillId").click(function (){
+
 		// 登录校验
-		if ([[${session.loginUser != null}]]) {
+		var isLogin = [[${session.loginUser !=null}]]
+		if(isLogin){
 			var num = $("#numInput").val();// 秒杀商品数量
-			var key = $(this).attr("skuId")+"_"+$(this).attr("sessionId");
+			var key = $(this).attr("sessionId")+"_"+$(this).attr("skuId");
 			var randomCode = $(this).attr("randomCode");
 			location.href="http://seckill.mall.com/seckill/onSeckill?key="+key+"&randomCode="+randomCode+"&num="+num;
 		} else {
 			alert("请先登录！")
 		}
-		return false;
+		// return false;
 	})
 </script>
 

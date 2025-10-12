@@ -40,6 +40,6 @@ public class SeckillController {
     @GetMapping("/onSeckill")
     public R onSeckill(@RequestParam("key") String key,@RequestParam("randomCode") String randomCode,@RequestParam("num") Integer num) {
         String s = skuSeckillService.onSeckill();
-        return R.ok();
+        return R.ok().put("data","test");
     }
 }
