@@ -12,5 +12,5 @@ public interface SkuSeckillService {
 
     SeckillSkuRedisDTO getSeckillSkuBySkuId(Long skuId);
 
-    String onSeckill();
+    String onSeckill(String key, String randomCode, Integer num);
 }

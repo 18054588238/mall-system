@@ -5,6 +5,7 @@ import com.personal.common.utils.R;
 import com.personal.mall.seckill.dto.SeckillSkuRedisDTO;
 import com.personal.mall.seckill.service.SkuSeckillService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -38,8 +39,9 @@ public class SeckillController {
 
     // 进行商品秒杀
     @GetMapping("/onSeckill")
-    public R onSeckill(@RequestParam("key") String key,@RequestParam("randomCode") String randomCode,@RequestParam("num") Integer num) {
-        String s = skuSeckillService.onSeckill();
-        return R.ok().put("data","test");
+    public String onSeckill(@RequestParam("key") String key, @RequestParam("randomCode") String randomCode, @RequestParam("num") Integer num, Model model) {
+        String orderSn = skuSeckillService.onSeckill(key,randomCode,num);
+        model.addAttribute("orderSn",orderSn);
+        return "success";
     }
 }

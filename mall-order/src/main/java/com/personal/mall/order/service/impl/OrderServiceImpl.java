@@ -15,6 +15,7 @@ import com.personal.mall.order.interceptor.AuthInterceptor;
 import com.personal.mall.order.service.OrderItemService;
 import com.personal.mall.order.utils.OrderMsgProducer;
 import com.personal.mall.order.vo.*;
+import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
@@ -133,7 +134,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
                 Arrays.asList(key),
                 orderToken);
 
-        if (l == 9) {
+        if (l == 0) {
             // 表示重复提交
             responseVO.setCode(1);
             return responseVO;

@@ -1,13 +1,17 @@
 package com.personal.mall.seckill.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.personal.common.constant.OrderConstant;
 import com.personal.common.constant.SeckillConstant;
 import com.personal.common.utils.R;
+import com.personal.common.vo.MemberVO;
 import com.personal.mall.seckill.dto.SeckillSkuRedisDTO;
 import com.personal.mall.seckill.feign.CouponFeignService;
 import com.personal.mall.seckill.feign.ProductFeignService;
 import com.personal.mall.seckill.service.SkuSeckillService;
+import com.personal.mall.seckill.vo.OrderSubmitVO;
 import com.personal.mall.seckill.vo.SeckillSkuSessionVO;
+import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.redisson.api.RSemaphore;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
@@ -19,6 +23,7 @@ import org.thymeleaf.ITemplateEngine;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,7 +37,8 @@ public class SkuSeckillServiceImpl implements SkuSeckillService {
     private ProductFeignService productFeignService;
     @Autowired
     private RedissonClient redissonClient;
-
+    @Autowired
+    private RocketMQTemplate rocketMQTemplate;
 
     @Override
     public void seckillSkuLatestDays(String[] latestDays) {
@@ -94,12 +100,56 @@ public class SkuSeckillServiceImpl implements SkuSeckillService {
     }
 
     @Override
-    public String onSeckill() {
+    public String onSeckill(String key, String randomCode, Integer num) {
+        /*2. 校验
+          a. 登录校验：
+          b. 合法性校验：时效性（在秒杀时间范围内）、随机码校验、幂等性、秒杀数量
+          c. 获取信号量
+        */
+        // key:sessionId_skuId
+
+        BoundHashOperations<String, String, String> operations = redisTemplate.boundHashOps(SeckillConstant.SKU_CACHE_PREFIX);
+        Boolean hasKey = operations.hasKey(key);
+        if (Boolean.TRUE.equals(hasKey)) {
+            String dtoJson = operations.get(key);
+            SeckillSkuRedisDTO dto = JSON.parseObject(dtoJson, SeckillSkuRedisDTO.class);
+            Date date = new Date();
+            // 校验秒杀时间、随机码、秒杀数据
+            if (date.after(dto.getStartTime()) && date.before(dto.getEndTime()) && randomCode.equals(dto.getRandomCode()) && num<=dto.getSeckillSkuRelationVO().getSeckillLimit().intValue()) {
+                // 幂等性校验(防止重复提交) --- 将秒杀成功的信息存储到redis中：memberId_sessionId_skuId
+                Long memberId = new ThreadLocal<MemberVO>().get().getId();
+                Boolean ifAbsent = redisTemplate.opsForValue().setIfAbsent(memberId + "_" + key, num.toString(),(dto.getEndTime().getTime()-date.getTime()), TimeUnit.MILLISECONDS);
+                if (Boolean.TRUE.equals(ifAbsent)) {
+                    // 表示第一次秒杀
+                    // 获取信号量
+                    RSemaphore semaphore = redissonClient.getSemaphore(SeckillConstant.SKU_STOCK_SEMAPHORE + randomCode);
+                    try {
+                        boolean b = semaphore.tryAcquire(num, 100, TimeUnit.MILLISECONDS);// 规定时间内未获取到指定的数量，则返回false
+                        if (b) {
+                            // 表示秒杀成功
+                            // 通过消息队列，发起创建订单的请求，订单服务监听消息队列，完成订单的创建
+                            // 创建订单需要的参数
+                            OrderSubmitVO submitVO = new OrderSubmitVO();
+                            String token = UUID.randomUUID().toString().replaceAll("-", "");
+                            submitVO.setOrderToken(token);
+                            // 获取当前登录用户的地址信息
+//                            List<MemberAddressVO> addressInfo = memberServiceFeign.getAddressInfo(memberVOId);
+                            submitVO.setAddressId(1l);// 先随便写一个
+                            rocketMQTemplate.sendOneWay(OrderConstant.ROCKETMQ_SECKILL_ORDER_TOPIC,JSON.toJSONString(submitVO));
+                        }
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+            }
+        }
+
         return "";
     }
 
     private void saveSeckillInfosToRedis(List<SeckillSkuSessionVO> seckillSkuSessionVOS) {
-        // 1.保存秒杀活动信息，key： start_endTime    value: sessionId_skuId
+        // 1.保存秒杀活动信息，key： startTime_endTime    value: sessionId_skuId
 
         // 2.保存秒杀商品的详情 hash存储 key：sessionId_skuId  value：sku相关信息封装的对象
         // boundHashOps方法可以获取一个与特定键绑定的 Hash操作对象
