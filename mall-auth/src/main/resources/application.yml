@@ -8,6 +8,11 @@ spring:
     nacos:
       discovery:
         server-addr: 127.0.0.1:8848
+    sentinel:
+      transport:
+        dashboard: 127.0.0.1:8080
+        port: 8719
+        client-ip: 192.168.0.102
   application:
     name: mall-auth
   thymeleaf:
@@ -20,3 +25,9 @@ spring:
     redis:
 #      flush-mode: on_save # Sessions flush mode.
       namespace: spring:session # Namespace for keys used to store sessions.
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
