@@ -9,6 +9,12 @@ spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
+  cloud:
+    sentinel:
+      transport:
+        dashboard: 127.0.0.1:8080
+        port: 8719
+        client-ip: 192.168.0.102
 #  cloud:
 #    nacos:
 #      discovery:
@@ -20,3 +26,9 @@ mybatis-plus:
       id-type: auto   #????
 server:
   port: 8050
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'

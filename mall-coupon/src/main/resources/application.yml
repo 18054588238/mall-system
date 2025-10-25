@@ -6,6 +6,12 @@ spring:
     password: rootroot
     url: jdbc:mysql://localhost:3306/mall-sms
     driver-class-name: com.mysql.cj.jdbc.Driver
+  cloud:
+    sentinel:
+      transport:
+        dashboard: 127.0.0.1:8080
+        port: 8719
+        client-ip: 192.168.0.102
 #  cloud:
 #    nacos:
 #      discovery:
@@ -17,3 +23,8 @@ mybatis-plus:
       id-type: auto   #主键自增
 server:
   port: 8010
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'

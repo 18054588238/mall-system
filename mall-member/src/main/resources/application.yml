@@ -10,6 +10,12 @@ spring:
       connection-timeout: 60000
       maximum-pool-size: 10
   #  cloud:
+  cloud:
+    sentinel:
+      transport:
+        dashboard: 127.0.0.1:8080
+        port: 8719
+        client-ip: 192.168.0.102
 #    nacos:
 #      discovery:
 #        server-addr: 127.0.0.1:8848
@@ -21,3 +27,9 @@ mybatis-plus:
 
 server:
   port: 8020
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
