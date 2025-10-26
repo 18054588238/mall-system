@@ -12,7 +12,7 @@ spring:
         server-addr: 127.0.0.1:8848
     sentinel:
       transport:
-        dashboard: 127.0.0.1:8080
+        dashboard: 127.0.0.1:8858
         port: 8719
         client-ip: 192.168.0.102
   session:
@@ -39,7 +39,7 @@ user:
   userName: yyqx
   age: 24
 rocketmq:
-  name-server: 192.168.100.96:9876
+  name-server: 192.168.0.102:9876
   producer:
     group: order-producer
   consumer:

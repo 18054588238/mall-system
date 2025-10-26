@@ -1,4 +1,4 @@
-package com.personal.common.handler;
+package com.personal.mall.seckill.handler;
 
 import com.alibaba.csp.sentinel.adapter.spring.webmvc.callback.BlockExceptionHandler;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
@@ -21,6 +21,6 @@ public class CustomUrlBlockHandler implements BlockExceptionHandler {
     public void handle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, BlockException e) throws Exception {
         R r = R.error(500,"访问过于频繁，请稍后再试");
         httpServletResponse.setContentType("application/json;charset=UTF-8");
-        httpServletResponse.getWriter().write(JSON.toJSONString(r));
+        httpServletResponse.getWriter().write(JSON.toJSONString(r)); // 友好响应前端
     }
 }

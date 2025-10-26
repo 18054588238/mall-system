@@ -1,5 +1,7 @@
 package com.personal.mall.seckill.service.impl;
 
+import com.alibaba.csp.sentinel.annotation.SentinelResource;
+import com.alibaba.csp.sentinel.slots.block.BlockException;
 import com.alibaba.fastjson.JSON;
 import com.personal.common.constant.OrderConstant;
 import com.personal.common.constant.SeckillConstant;
@@ -11,6 +13,7 @@ import com.personal.mall.seckill.feign.ProductFeignService;
 import com.personal.mall.seckill.service.SkuSeckillService;
 import com.personal.mall.seckill.vo.OrderSubmitVO;
 import com.personal.mall.seckill.vo.SeckillSkuSessionVO;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.redisson.api.RSemaphore;
 import org.redisson.api.RedissonClient;
@@ -26,6 +29,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class SkuSeckillServiceImpl implements SkuSeckillService {
 
@@ -52,6 +56,13 @@ public class SkuSeckillServiceImpl implements SkuSeckillService {
         }
     }
 
+    // blockHandler 函数，原方法调用被限流/降级/系统保护的时候调用
+    public List<SeckillSkuRedisDTO> blockHandlerForCurSeckillSkus(BlockException ex) {
+        log.error("限流执行的 blockHandler 方法 ....{}",ex.getMessage());
+        return null;
+    }
+
+    @SentinelResource(value = "getCurSeckillSkus",blockHandler = "blockHandlerForCurSeckillSkus")
     @Override
     public List<SeckillSkuRedisDTO> getCurSeckillSkus() {
         // 获取当前时间

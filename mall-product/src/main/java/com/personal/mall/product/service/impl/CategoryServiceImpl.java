@@ -5,6 +5,9 @@ import com.alibaba.fastjson.TypeReference;
 import com.personal.mall.product.entity.vo.Catalog2VO;
 import com.personal.mall.product.service.CategoryBrandRelationService;
 import org.apache.commons.lang.StringUtils;
+import org.apache.skywalking.apm.toolkit.trace.Tag;
+import org.apache.skywalking.apm.toolkit.trace.Tags;
+import org.apache.skywalking.apm.toolkit.trace.Trace;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -114,6 +117,11 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
                 .eq("parent_cid",0));
     }
 
+    @Trace // 会被skywalking监控
+    @Tags({
+            @Tag(key = "getCatalog2JSON",value = "returnedObj"),// 获取返回值
+            @Tag(key = "param",value = "arg[0]")// 获取参数
+    })
     @Cacheable(value = {"category"},key = "#root.method.name",sync = true)
     @Override
     public Map<String, List<Catalog2VO>> getCatalog2JSON() {

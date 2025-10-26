@@ -13,9 +13,11 @@ spring:
         add-to-simple-url-handler-mapping: true
     sentinel:
       transport:
-        dashboard: 127.0.0.1:8080
+        dashboard: 127.0.0.1:8858
         port: 8719
         client-ip: 192.168.0.102
+      filter:
+        enabled: false
 server:
   port: 8070
 management:
